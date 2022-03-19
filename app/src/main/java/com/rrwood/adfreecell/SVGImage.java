@@ -76,15 +76,19 @@ public class SVGImage {
     }
 
     public void drawSelf(Canvas canvas) {
+        drawSelf(canvas, null);
+    }
+
+    public void drawSelf(Canvas canvas, Paint paint) {
         if (this.bitmap != null) {
-            canvas.drawBitmap(this.bitmap, this.rect.left, this.rect.top, null);
+            canvas.drawBitmap(this.bitmap, this.rect.left, this.rect.top, paint);
 
             if (this.drawOutlineRect) {
-                Paint paint = new Paint();
-                paint.setColor(Color.BLACK);
-                paint.setStyle(Paint.Style.STROKE);
-                paint.setStrokeWidth(2);
-                canvas.drawRect(this.rect, paint);
+                Paint outLinePaint = new Paint();
+                outLinePaint.setColor(Color.BLACK);
+                outLinePaint.setStyle(Paint.Style.STROKE);
+                outLinePaint.setStrokeWidth(2);
+                canvas.drawRect(this.rect, outLinePaint);
             }
         }
     }

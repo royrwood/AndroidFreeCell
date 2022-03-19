@@ -4,6 +4,8 @@ import android.animation.Animator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.ColorFilter;
+import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -88,6 +90,7 @@ public class Card {
     private CardAction cardLastAction = CardAction.NO_ACTION;
     private int cardHiliteAlpha = 0;
     private Paint hilitePaint = null;
+    private Paint grayPaint = null;
 
     public Card(CardSuit cardSuit, int val, Drawable drawable) {
         this.cardSVImage = new SVGImage(drawable);
@@ -97,6 +100,10 @@ public class Card {
 
         this.hilitePaint = new Paint();
         this.hilitePaint.setARGB(255, 240, 240, 0);
+
+        ColorFilter filter = new LightingColorFilter(0xffdddddd, 0);
+        this.grayPaint = new Paint();
+        this.grayPaint.setColorFilter(filter);
     }
 
     public CardSuit getCardSuit() {
@@ -177,15 +184,20 @@ public class Card {
     }
 
     public void drawCard(Canvas canvas) {
-        if (this.cardIsSrcCard) {
-            int alpha = this.getHiliteAlpha();
-            this.hilitePaint.setAlpha(alpha);
-            RectF hiliteRect = new RectF(this.cardRect);
-            hiliteRect.inset(-5.0f, -5.0f);
-            canvas.drawRoundRect(hiliteRect, 6.0f, 6.0f, this.hilitePaint);
-        }
+//        if (this.cardIsSrcCard) {
+//            int alpha = this.getHiliteAlpha();
+//            this.hilitePaint.setAlpha(alpha);
+//            RectF hiliteRect = new RectF(this.cardRect);
+//            hiliteRect.inset(-5.0f, -5.0f);
+//            canvas.drawRoundRect(hiliteRect, 6.0f, 6.0f, this.hilitePaint);
+//        }
 
-        this.cardSVImage.drawSelf(canvas);
+        if (this.cardIsSrcCard) {
+            this.cardSVImage.drawSelf(canvas, this.grayPaint);
+        }
+        else {
+            this.cardSVImage.drawSelf(canvas);
+        }
     }
 
     public boolean contains(int x, int y) {
