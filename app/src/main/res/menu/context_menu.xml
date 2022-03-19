@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/context_menu_action_1"
+        android:title="@string/context_menu_action_1"/>
+    
+    <item
+        android:id="@+id/context_menu_action_2"
+        android:title="@string/context_menu_action_2"/>
+
+</menu>

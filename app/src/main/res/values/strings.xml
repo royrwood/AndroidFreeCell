@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">AdFreeCell</string>
+    <string name="action_settings">Settings</string>
+    <string name="context_menu_action_1">Context Menu Item 1</string>
+    <string name="context_menu_action_2">Context Menu Item 2</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_action_2">This is my menu item</string>
+</resources>
