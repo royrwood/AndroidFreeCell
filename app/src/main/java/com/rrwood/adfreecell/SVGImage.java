@@ -2,6 +2,8 @@ package com.rrwood.adfreecell;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -13,10 +15,15 @@ public class SVGImage {
     private Drawable drawable = null;
     private Bitmap bitmap = null;
     private final Rect rect = new Rect();
+    private boolean drawOutlineRect = false;
 
 
     public SVGImage(Drawable drawable) {
         this.drawable = drawable;
+    }
+    public SVGImage(Drawable drawable, boolean drawOutlineRect) {
+        this.drawable = drawable;
+        this.drawOutlineRect = drawOutlineRect;
     }
 
     public int getWidth() {
@@ -68,13 +75,17 @@ public class SVGImage {
         }
     }
 
-    public void moveTo(int x, int y) {
-        this.rect.offsetTo(x, y);
-    }
-
     public void drawSelf(Canvas canvas) {
         if (this.bitmap != null) {
             canvas.drawBitmap(this.bitmap, this.rect.left, this.rect.top, null);
+
+            if (this.drawOutlineRect) {
+                Paint paint = new Paint();
+                paint.setColor(Color.BLACK);
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setStrokeWidth(2);
+                canvas.drawRect(this.rect, paint);
+            }
         }
     }
 }

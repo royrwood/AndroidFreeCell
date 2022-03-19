@@ -8,12 +8,7 @@ import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
-/**
- * Class representing a stack of Cards
- *
- * @author rrwood
- *
- */
+
 public class CardStack {
     enum CardStackType {
         FREECELLSTACK, ACESTACK, GENERALSTACK
@@ -27,8 +22,8 @@ public class CardStack {
     private ArrayList<Card> cards = null;
     private Rect baseRect = null;
     private Rect fullRect = null;
-//    private boolean isHilighted = false;
     private int cardVertOffset = 0;
+//    private boolean isHilighted = false;
 
 
     public CardStack(Card.CardSuit suit, CardStackType stackType, Drawable emptyStackDrawable) {

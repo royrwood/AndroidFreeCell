@@ -69,19 +69,16 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     static final int NUMFREECELLSTACKS = 4;
     static final int NUMACESTACKS = 4;
     static final int NUMGENERALSTACKS = 8;
-    static final int STACKVERTCARDOFFSET = 30;
-    static final int STACKVERTSEPARATION = 20;
-    static final int ICON_BORDER_SIZE = 10;
-    static final int CARD_BORDER_SIZE = 10;
 
 
     private GameView gameView = null;
-    private int naturalCardWidth = 224;
-    private int naturalCardHeight = 313;
+    private final int naturalCardWidth = 224;
+    private final int naturalCardHeight = 313;
     private int currentCardWidth = 0;
     private int currentCardHeight = 0;
     private int cardGridWidth = 0;
     private int cardGridHeight = 0;
+    private int cardBorderSize = 0;
 
     private final Random random = new Random();
 
@@ -145,13 +142,13 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 
         // Set up the restart icon
         Drawable restartDrawable = ResourcesCompat.getDrawable(res, R.drawable.redo_arrow_svg, null);
-        this.restartSVGImage = new SVGImage(restartDrawable);
-        this.gameView.addIcon(this.restartSVGImage);
+        this.restartSVGImage = new SVGImage(restartDrawable, true);
+        this.gameView.addSVImage(this.restartSVGImage);
 
         // Set up the undo icon
         Drawable undoDrawable = ResourcesCompat.getDrawable(res, R.drawable.undo_arrow_svg, null);
-        this.undoSVGImage = new SVGImage(undoDrawable);
-        this.gameView.addIcon(this.undoSVGImage);
+        this.undoSVGImage = new SVGImage(undoDrawable, true);
+        this.gameView.addSVImage(this.undoSVGImage);
 
         // Set up the audio player
         this.audioPlayer = new AudioPlayer();
@@ -927,69 +924,6 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 
 
     @Override
-    // Receive notification of changes in the position/size of the GameView
-    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-        Log.d(TAG,"onLayoutChange: (left,top,right,bottom) = (" + left + "," + top + "," + right + "," + bottom + ")");
-        Log.d(TAG,"onLayoutChange: (oldLeft,oldTop,oldRight,oldBottom) = (" + oldLeft + "," + oldTop + "," + oldRight + "," + oldBottom + ")");
-
-        int viewHeight = bottom - top;
-        int viewWidth = right - left;
-        int viewWidthHalf = viewWidth / 2;
-
-        this.cardGridWidth = (viewWidth / NUMGENERALSTACKS);  // Split the available space up for the card stacks
-        this.cardGridHeight = (this.naturalCardHeight * this.cardGridWidth) / this.naturalCardWidth;
-        this.currentCardWidth = this.cardGridWidth - 2*CARD_BORDER_SIZE;
-        this.currentCardHeight = (this.naturalCardHeight * this.currentCardWidth) / this.naturalCardWidth;
-
-        int actionsBoxWidth = this.cardGridWidth;
-        int actionsBoxHeight = this.cardGridHeight / 2;
-        int actionsSize = Math.min(actionsBoxWidth - 2*ICON_BORDER_SIZE, actionsBoxHeight - 2*ICON_BORDER_SIZE);
-
-        // Position the restart icon
-        restartSVGImage.centerAt(viewWidthHalf, STACKVERTSEPARATION + (actionsBoxHeight / 2), actionsSize);
-
-        // Position the undo icon
-        undoSVGImage.centerAt(viewWidthHalf, STACKVERTSEPARATION + actionsBoxHeight + (actionsBoxHeight / 2), actionsSize);
-
-        // Place the ace stacks
-        for (int i = 0; i < NUMACESTACKS; i++) {
-            int stackLeft = i * this.cardGridWidth + CARD_BORDER_SIZE;
-            int stackRight = stackLeft + this.currentCardWidth;
-            int stackTop = CARD_BORDER_SIZE;
-            int stackBottom = stackTop + this.currentCardHeight;
-            CardStack cardStack = this.aceStacks.get(i);
-            cardStack.setBaseRect(stackLeft, stackTop, stackRight, stackBottom);
-        }
-
-        // Place the free cells
-        for (int i = 0; i < NUMFREECELLSTACKS; i++) {
-            int stackLeft = viewWidthHalf + i * this.cardGridWidth + CARD_BORDER_SIZE;
-            int stackRight = stackLeft + this.currentCardWidth;
-            int stackTop = CARD_BORDER_SIZE;
-            int stackBottom = stackTop + this.currentCardHeight;
-            CardStack cardStack = freecellStacks.get(i);
-            cardStack.setBaseRect(stackLeft, stackTop, stackRight, stackBottom);
-        }
-
-        // Place the general stacks
-        for (int i = 0; i < NUMGENERALSTACKS; i++) {
-            int stackLeft = i * this.cardGridWidth + CARD_BORDER_SIZE;
-            int stackRight = stackLeft + this.currentCardWidth;
-            int stackTop = this.cardGridHeight + CARD_BORDER_SIZE;
-            int stackBottom = stackTop + this.currentCardHeight;
-            CardStack cardStack = generalStacks.get(i);
-            cardStack.setBaseRect(stackLeft, stackTop, stackRight, stackBottom);
-        }
-
-//        if (!didInitialNewGame) {
-//            // Start a new game
-//            startGame(true);
-//
-//            didInitialNewGame = true;
-//        }
-    }
-
-    @Override
     public boolean onTouch(View v, MotionEvent event) {
         Log.d(TAG,"onTouch: event=" + MotionEvent.actionToString(event.getAction()));
 
@@ -1209,4 +1143,62 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
         // Pass
     }
 
+    @Override
+    // Receive notification of changes in the position/size of the GameView
+    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+        Log.d(TAG,"onLayoutChange: (left,top,right,bottom) = (" + left + "," + top + "," + right + "," + bottom + ")");
+        Log.d(TAG,"onLayoutChange: (oldLeft,oldTop,oldRight,oldBottom) = (" + oldLeft + "," + oldTop + "," + oldRight + "," + oldBottom + ")");
+
+        int viewHeight = bottom - top;
+        int viewWidth = right - left;
+        int viewWidthHalf = viewWidth / 2;
+
+        this.cardGridWidth = (viewWidth / NUMGENERALSTACKS + 1);
+        this.cardGridHeight = (this.naturalCardHeight * this.cardGridWidth) / naturalCardWidth;
+        this.cardBorderSize = this.cardGridWidth / 8;
+        this.currentCardWidth = this.cardGridWidth - 2*this.cardBorderSize;
+        this.currentCardHeight = (this.naturalCardHeight * this.currentCardWidth) / naturalCardWidth;
+
+        // Position the restart and undo icons
+        int actionsSize = this.currentCardHeight / 2;
+        restartSVGImage.centerAt(viewWidthHalf, this.cardBorderSize + actionsSize / 2, actionsSize);
+        undoSVGImage.centerAt(viewWidthHalf, this.cardBorderSize + (3 * actionsSize ) / 2, actionsSize);
+
+        // Place the ace stacks
+        for (int i = 0; i < NUMACESTACKS; i++) {
+            int stackLeft = this.cardBorderSize + i * (this.currentCardWidth + this.cardBorderSize);
+            int stackRight = stackLeft + this.currentCardWidth;
+            int stackTop = this.cardBorderSize;
+            int stackBottom = stackTop + this.currentCardHeight;
+            CardStack cardStack = this.aceStacks.get(i);
+            cardStack.setBaseRect(stackLeft, stackTop, stackRight, stackBottom);
+        }
+
+        // Place the free cells
+        for (int i = 0; i < NUMFREECELLSTACKS; i++) {
+            int stackLeft = viewWidth -  (i + 1) * (this.currentCardWidth + this.cardBorderSize);
+            int stackRight = stackLeft + this.currentCardWidth;
+            int stackTop = this.cardBorderSize;
+            int stackBottom = stackTop + this.currentCardHeight;
+            CardStack cardStack = freecellStacks.get(i);
+            cardStack.setBaseRect(stackLeft, stackTop, stackRight, stackBottom);
+        }
+
+        // Place the general stacks
+        for (int i = 0; i < NUMGENERALSTACKS; i++) {
+            int stackLeft = i * this.cardGridWidth + this.cardBorderSize;
+            int stackRight = stackLeft + this.currentCardWidth;
+            int stackTop = this.cardGridHeight + this.cardBorderSize;
+            int stackBottom = stackTop + this.currentCardHeight;
+            CardStack cardStack = generalStacks.get(i);
+            cardStack.setBaseRect(stackLeft, stackTop, stackRight, stackBottom);
+        }
+
+//        if (!didInitialNewGame) {
+//            // Start a new game
+//            startGame(true);
+//
+//            didInitialNewGame = true;
+//        }
+    }
 }

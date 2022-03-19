@@ -85,7 +85,7 @@ public class GameView extends View {
      *
      * @param SVGImage the Icon to add
      */
-    public void addIcon(SVGImage SVGImage) {
+    public void addSVImage(SVGImage SVGImage) {
         SVGImages.add(SVGImage);
     }
 
