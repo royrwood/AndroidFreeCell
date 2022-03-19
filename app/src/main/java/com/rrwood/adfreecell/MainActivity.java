@@ -10,20 +10,13 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.res.AssetManager;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.View;
@@ -31,12 +24,9 @@ import android.view.Window;
 import android.content.pm.ActivityInfo;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
-import android.widget.AdapterView;
 
 import androidx.core.content.res.ResourcesCompat;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -80,7 +70,6 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 
     private ArrayList<Card> cards = null;
     private HashMap<Animator, Card> movingCards = null;
-    private ArrayList<Card> matchingCards = null;
 
     private ArrayList<CardStack> freecellStacks = null;
     private ArrayList<CardStack> aceStacks = null;
@@ -92,12 +81,12 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     private SVGImage restartSVGImage = null;
     private SVGImage undoSVGImage = null;
 
-    private CardStack mSrcStack = null;
-    private CardStack.CardStackType mSrcStackType = null;
-    private Card mSrcCard = null;
-    private int mSrcCardVal = -1;
-    private Card.CardSuit mSrcCardSuit = null;
-    private Card.CardSuitColour mSrcCardSuitColour = null;
+    private CardStack srcStack = null;
+    private CardStack.CardStackType srcStackType = null;
+    private Card srcCard = null;
+    private int srcCardVal = -1;
+    private Card.CardSuit srcCardSuit = null;
+    private Card.CardSuitColour srcCardSuitColour = null;
     private CardStack dstStack = null;
 
     private AudioPlayer audioPlayer = null;
@@ -148,9 +137,6 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 
         // Set up the list of card moves (used during undo)
         this.cardMoves = new ArrayList<CardMove>();
-
-        // Set up the list of "matching" general cards
-        this.matchingCards = new ArrayList<Card>();
 
         // Maintain a list of active animations and cards
         this.movingCards = new HashMap<Animator, Card>();
@@ -386,82 +372,80 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 
     private void clearSrcCardStack() {
         // Clear any cards that are hilighted as matches for the current source card
-        for (Card card : matchingCards) {
-            card.setIsDstCard(false);
+        for (Card card : this.cards) {
+            if (card.isDstCard()) {
+                card.setIsDstCard(false);
 
-            Animator anim = card.getHiliteAnimation();
+                Animator anim = card.getHiliteAnimation();
 
-            if (anim != null) {
-                anim.cancel();
-                card.setHiliteAnimation(null);
+                if (anim != null) {
+                    anim.cancel();
+                    card.setHiliteAnimation(null);
+                }
             }
         }
-
-        matchingCards.clear();
-
 
         // Now clear the source card
-        if (mSrcCard != null) {
-            mSrcCard.setIsSrcCard(false);
-            mSrcCard.setLastAction(Card.CardAction.NO_ACTION);
+        if (this.srcCard != null) {
+            this.srcCard.setIsSrcCard(false);
+            this.srcCard.setLastAction(Card.CardAction.NO_ACTION);
 
-            if (gameView != null) {
-                gameView.postInvalidate();
-            }
+            this.gameView.postInvalidate();
         }
 
-        mSrcCardSuitColour = null;
-        mSrcCardSuit = null;
-        mSrcCardVal = -1;
-        mSrcCard = null;
-        mSrcStack = null;
-        mSrcStackType = null;
+        this.srcCardSuitColour = null;
+        this.srcCardSuit = null;
+        this.srcCardVal = -1;
+        this.srcCard = null;
+        this.srcStack = null;
+        this.srcStackType = null;
     }
 
 
-    private void selectSrcCardStack(CardStack stack) {
+    private void selectSrcCardStack(CardStack targetStack) {
         clearSrcCardStack();
 
-        if (stack != null && stack.topCard() != null) {
-//			Log.d(TAG,"selectCardStack: Selecting stack " + stack);
+        Card targetCard = (targetStack != null) ? targetStack.topCard() : null;
 
-            mSrcStack = stack;
-            mSrcStackType = mSrcStack.getStackType();
-            mSrcCard = mSrcStack.topCard();
-            mSrcCardVal = mSrcCard.getCardVal();
-            mSrcCardSuitColour = mSrcCard.getSuitColour();
-            mSrcCardSuit = mSrcCard.getCardSuit();
-            mSrcCard.setLastAction(Card.CardAction.MOUSE_DOWN);
+        if (targetStack == null || targetCard == null) {
+            return;
+        }
 
-            mSrcCard.setIsSrcCard(true);
+        // Set the card state
+        targetCard.setIsSrcCard(true);
+        targetCard.setLastAction(Card.CardAction.MOUSE_DOWN);
 
-            // Identify any cards that this source card can match
-            for (CardStack tempStack : generalStacks) {
-                ArrayList<Card> tempCards = tempStack.getCards();
+        // And remember this stack/card
+        this.srcStack = targetStack;
+        this.srcStackType = this.srcStack.getStackType();
+        this.srcCard = targetCard;
+        this.srcCardVal = targetCard.getCardVal();
+        this.srcCardSuitColour = targetCard.getSuitColour();
+        this.srcCardSuit = targetCard.getCardSuit();
 
-                for (Card card : tempCards) {
-                    if (cardsCanStack(mSrcCard, card)) {
-                        card.setIsDstCard(true);
+        // Identify any cards that this source card can match
+        for (CardStack tempStack : generalStacks) {
+            ArrayList<Card> tempCards = tempStack.getCards();
 
-                        matchingCards.add(card);
+            for (Card card : tempCards) {
+                if (cardsCanStack(targetCard, card)) {
+                    card.setIsDstCard(true);
 
-                        ObjectAnimator animation = null;
-                        animation = ObjectAnimator.ofObject(card, "hiliteAlpha", new IntEvaluator(), 0, 255);
-                        animation.addUpdateListener(this);
-                        animation.setDuration(500);
-                        animation.setInterpolator(new DecelerateInterpolator());
-                        animation.setRepeatCount(ValueAnimator.INFINITE);
-                        animation.setRepeatMode(ValueAnimator.REVERSE);
+                    ObjectAnimator animation = ObjectAnimator.ofObject(card, "hiliteAlpha", new IntEvaluator(), 0, 255);
+                    animation.addUpdateListener(this);
+                    animation.setDuration(500);
+                    animation.setInterpolator(new DecelerateInterpolator());
+                    animation.setRepeatCount(ValueAnimator.INFINITE);
+                    animation.setRepeatMode(ValueAnimator.REVERSE);
 
-                        card.setHiliteAnimation(animation);
+                    card.setHiliteAnimation(animation);
 
-                        animation.start();
-                    }
+                    animation.start();
                 }
             }
-
-            gameView.postInvalidate();
         }
+
+        this.gameView.postInvalidate();
     }
 
     private CardStack findCardStack(int x, int y) {
@@ -775,13 +759,13 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             long currentMillis = event.getEventTime();
 
-            if (currentMillis < lastActionDownMillis + DOUBLE_CLICK_MILLIS) {
+            if (currentMillis < this.lastActionDownMillis + DOUBLE_CLICK_MILLIS) {
                 doubleClickDetected = true;
 
                 currentMillis = -1;
             }
 
-            lastActionDownMillis = currentMillis;
+            this.lastActionDownMillis = currentMillis;
         }
 
         return doubleClickDetected;
@@ -789,18 +773,18 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 
 
     private void doDrag(MotionEvent event) {
-        if (mSrcCard == null) {
+        if (srcCard == null) {
             return;
         }
 
-        int cardWidth = mSrcCard.getWidth();
-        int cardHeight = mSrcCard.getHeight();
+        int cardWidth = srcCard.getWidth();
+        int cardHeight = srcCard.getHeight();
         int x = (int) event.getX() - cardWidth/2;
         int y = (int) event.getY() - cardHeight/2;
 
-        mSrcCard.moveTo(x, y);
-        mSrcCard.setMoving(true);
-        mSrcCard.setLastAction(Card.CardAction.MOUSE_DRAG);
+        srcCard.moveTo(x, y);
+        srcCard.setMoving(true);
+        srcCard.setLastAction(Card.CardAction.MOUSE_DRAG);
 
         gameView.postInvalidate();
     }
@@ -963,21 +947,16 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     public boolean onTouch(View v, MotionEvent event) {
         Log.d(TAG,"onTouch: event=" + MotionEvent.actionToString(event.getAction()));
 
-        // Early processing for the icons (undo, new game, restart game)
-
-        if (event.getAction() == MotionEvent.ACTION_DOWN && undoSVGImage.containsPt((int) event.getX(), (int) event.getY())) {
-            gameView.playSoundEffect(SoundEffectConstants.CLICK);
-
+        // Early processing for the undo/restart icons
+        if (event.getAction() == MotionEvent.ACTION_DOWN && this.undoSVGImage.containsPt((int) event.getX(), (int) event.getY())) {
+            this.gameView.playSoundEffect(SoundEffectConstants.CLICK);
             undoMove();
-
             return true;
         }
-        else if (event.getAction() == MotionEvent.ACTION_DOWN && restartSVGImage.containsPt((int) event.getX(), (int) event.getY())) {
+        else if (event.getAction() == MotionEvent.ACTION_DOWN && this.restartSVGImage.containsPt((int) event.getX(), (int) event.getY())) {
             doDialog();
-
             return true;
         }
-
 
         // Main processing for card-related events
 
@@ -988,10 +967,10 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 
         // These booleans make things more readable below...
         boolean doubleClickDetected = doubleClickOccured(event);
-        boolean movingBetweenStacks = (mSrcCard != null && mSrcStack != null  && dstStack != null && mSrcStack != dstStack);
-        boolean srcAndDstAreGeneral = (movingBetweenStacks && mSrcStack.getStackType() == CardStack.CardStackType.GENERALSTACK && dstStack.getStackType() == CardStack.CardStackType.GENERALSTACK);
-        boolean srcCardIsDragging = mSrcCard != null && mSrcCard.getLastAction() == Card.CardAction.MOUSE_DRAG;
-        boolean srcCardWasClicked = mSrcCard != null && mSrcCard.getLastAction() == Card.CardAction.MOUSE_DOWN;
+        boolean movingBetweenStacks = (this.srcCard != null && this.srcStack != null  && dstStack != null && this.srcStack != dstStack);
+        boolean srcAndDstAreGeneral = (movingBetweenStacks && this.srcStack.getStackType() == CardStack.CardStackType.GENERALSTACK && dstStack.getStackType() == CardStack.CardStackType.GENERALSTACK);
+        boolean srcCardIsDragging = this.srcCard != null && this.srcCard.getLastAction() == Card.CardAction.MOUSE_DRAG;
+        boolean srcCardWasClicked = this.srcCard != null && this.srcCard.getLastAction() == Card.CardAction.MOUSE_DOWN;
 
         if (dstStack == null && doubleClickDetected) {
             // Double-click in blank space means auto-move
@@ -1010,36 +989,36 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
             // Don't eat this event-- if we do, then context menu won't show...
             // handledEvent = true;
         }
-        else if (movingBetweenStacks && !srcAndDstAreGeneral  && event.getAction() == MotionEvent.ACTION_DOWN) {
-            // Move single card from one stack to another stack
-            if (cardCanMoveToStack(mSrcCard, dstStack)) {
-                Log.d(TAG,"onTouch: Move single card");
-                moveSingleCard(mSrcStack, dstStack, 0, true);
-                clearSrcCardStack();
-                clearDstCardStack();
-            }
-            else {
-                Log.d(TAG,"onTouch: Ignoring invalid single-card move");
-                selectSrcCardStack(dstStack);
-                clearDstCardStack();
-            }
-
-            handledEvent = true;
-        }
-        else if (srcAndDstAreGeneral && event.getAction() == MotionEvent.ACTION_DOWN) {
-            // Move from one general stack to another (i.e. possible run move)
-            Log.d(TAG,"onTouch: Move between general stacks");
-            if (moveMultiCards(mSrcStack, dstStack)) {
-                clearSrcCardStack();
-                clearDstCardStack();
-            }
-            else {
-                selectSrcCardStack(dstStack);
-                clearDstCardStack();
-            }
-
-            handledEvent = true;
-        }
+//        else if (movingBetweenStacks && !srcAndDstAreGeneral  && event.getAction() == MotionEvent.ACTION_DOWN) {
+//            // Move single card from one stack to another stack
+//            if (cardCanMoveToStack(srcCard, dstStack)) {
+//                Log.d(TAG,"onTouch: Move single card");
+//                moveSingleCard(srcStack, dstStack, 0, true);
+//                clearSrcCardStack();
+//                clearDstCardStack();
+//            }
+//            else {
+//                Log.d(TAG,"onTouch: Ignoring invalid single-card move");
+//                selectSrcCardStack(dstStack);
+//                clearDstCardStack();
+//            }
+//
+//            handledEvent = true;
+//        }
+//        else if (srcAndDstAreGeneral && event.getAction() == MotionEvent.ACTION_DOWN) {
+//            // Move from one general stack to another (i.e. possible run move)
+//            Log.d(TAG,"onTouch: Move between general stacks");
+//            if (moveMultiCards(srcStack, dstStack)) {
+//                clearSrcCardStack();
+//                clearDstCardStack();
+//            }
+//            else {
+//                selectSrcCardStack(dstStack);
+//                clearDstCardStack();
+//            }
+//
+//            handledEvent = true;
+//        }
         else if (dstStack != null && event.getAction() == MotionEvent.ACTION_DOWN) {
             // Select target card
             Log.d(TAG,"onTouch: Select card");
@@ -1048,60 +1027,60 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 
             handledEvent = true;
         }
-        else if (srcCardWasClicked && event.getAction() == MotionEvent.ACTION_MOVE) {
-            // If card was last clicked and user has dragged far enough, start moving
-
-            // Initially this ignored movement anywhere within the card, but that was too extreme,
-            // so just ignore motion in the middle of the card
-            Rect tempRect = mSrcCard.getRect();
-            int insetX = tempRect.width() / 4;
-            int insetY = tempRect.height() / 4;
-            tempRect.inset(insetX, insetY);
-            if (!tempRect.contains((int) event.getX(), (int) event.getY())) {
-                Log.d(TAG,"onTouch: Drag card begins");
-                doDrag(event);
-                selectDstCardStack(dstStack);
-            }
-            else {
-                Log.d(TAG,"onTouch: Ignoring drag within card current location");
-                clearDstCardStack();
-            }
-
-            handledEvent = true;
-        }
-        else if (srcCardIsDragging && event.getAction() == MotionEvent.ACTION_MOVE) {
-            // If card is already dragging, continue dragging it
-            Log.d(TAG,"onTouch: Drag card continues");
-            doDrag(event);
-            selectDstCardStack(dstStack);
-
-            handledEvent = true;
-        }
-        else if (srcCardIsDragging && event.getAction() == MotionEvent.ACTION_UP) {
-            // A dragged card was released, so move it to the new location or return it to its original stack
-//			if (cardCanMoveToStack(mSrcCard, dstStack)) {
-
-            // For debugging, allow drop of card anywhere
-            if (dstStack != null && dstStack != mSrcStack) {
-
-                Log.d(TAG,"onTouch: Stack drag-drop new location");
-                moveSingleCard(mSrcStack, dstStack, 0, true);
-                clearSrcCardStack();
-                clearDstCardStack();
-            }
-            else {
-                Log.d(TAG,"onTouch: Stack drag-drop old location");
-                moveSingleCard(mSrcStack, mSrcStack, 0, true);
-                clearDstCardStack();
-            }
-
-            handledEvent = true;
-        }
+//        else if (srcCardWasClicked && event.getAction() == MotionEvent.ACTION_MOVE) {
+//            // If card was last clicked and user has dragged far enough, start moving
+//
+//            // Initially this ignored movement anywhere within the card, but that was too extreme,
+//            // so just ignore motion in the middle of the card
+//            Rect tempRect = srcCard.getRect();
+//            int insetX = tempRect.width() / 4;
+//            int insetY = tempRect.height() / 4;
+//            tempRect.inset(insetX, insetY);
+//            if (!tempRect.contains((int) event.getX(), (int) event.getY())) {
+//                Log.d(TAG,"onTouch: Drag card begins");
+//                doDrag(event);
+//                selectDstCardStack(dstStack);
+//            }
+//            else {
+//                Log.d(TAG,"onTouch: Ignoring drag within card current location");
+//                clearDstCardStack();
+//            }
+//
+//            handledEvent = true;
+//        }
+//        else if (srcCardIsDragging && event.getAction() == MotionEvent.ACTION_MOVE) {
+//            // If card is already dragging, continue dragging it
+//            Log.d(TAG,"onTouch: Drag card continues");
+//            doDrag(event);
+//            selectDstCardStack(dstStack);
+//
+//            handledEvent = true;
+//        }
+//        else if (srcCardIsDragging && event.getAction() == MotionEvent.ACTION_UP) {
+//            // A dragged card was released, so move it to the new location or return it to its original stack
+////			if (cardCanMoveToStack(mSrcCard, dstStack)) {
+//
+//            // For debugging, allow drop of card anywhere
+//            if (dstStack != null && dstStack != srcStack) {
+//
+//                Log.d(TAG,"onTouch: Stack drag-drop new location");
+//                moveSingleCard(srcStack, dstStack, 0, true);
+//                clearSrcCardStack();
+//                clearDstCardStack();
+//            }
+//            else {
+//                Log.d(TAG,"onTouch: Stack drag-drop old location");
+//                moveSingleCard(srcStack, srcStack, 0, true);
+//                clearDstCardStack();
+//            }
+//
+//            handledEvent = true;
+//        }
 
         // Track mouse-up events or we will incorrectly allow drag/drop activity in code above
-        if (mSrcCard != null && event.getAction() == MotionEvent.ACTION_UP) {
+        if (this.srcCard != null && event.getAction() == MotionEvent.ACTION_UP) {
             Log.d(TAG,"onTouch: Noting mouse-up on selected card");
-            mSrcCard.setLastAction(Card.CardAction.MOUSE_UP);
+            this.srcCard.setLastAction(Card.CardAction.MOUSE_UP);
 
             handledEvent = true;
         }
