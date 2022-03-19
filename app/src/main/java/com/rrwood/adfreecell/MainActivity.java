@@ -467,13 +467,6 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
         }
     }
 
-    /**
-     * Locate the card stack at a given (x,y)
-     *
-     * @param x is the x coordinate
-     * @param y is the y coordinate
-     * @return the CardStack at the coordinates or null if no CardStack at that location
-     */
     private CardStack findCardStack(int x, int y) {
         CardStack targetStack = null;
 
@@ -488,12 +481,6 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     }
 
 
-    /**
-     * Find the ace stack that the input Card can move to
-     *
-     * @param card is the Card to move, if possible
-     * @return the ace CardStack that the input card can move to, or null if the card cannot be moved to the ace stack (i.e. wrong order)
-     */
     private CardStack findDstAceStack(Card card) {
         CardStack aceStack = null;
         Card.CardSuit cardSuit = card.getCardSuit();
@@ -520,12 +507,6 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     }
 
 
-    /**
-     * Find the first general CardStack that the input Card can move to
-     *
-     * @param card the Card to move, if possible
-     * @return the general CardStack the input Card can move to, or null if no move possible
-     */
     private CardStack findDstGeneralStack(Card card) {
         CardStack generalStack = null;
         Card.CardSuitColour cardColour = card.getSuitColour();
@@ -552,11 +533,6 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     }
 
 
-    /**
-     * Find the first empty freecell CardStack
-     *
-     * @return the first empty freecell CardStack or null if no empty freecell stacks available
-     */
     private CardStack findEmptyFreecellStack() {
         CardStack freecellStack = null;
 
@@ -572,9 +548,6 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     }
 
 
-    /**
-     * Undo the last move
-     */
     private void undoMove() {
         int numMoves = cardMoves.size();
 
@@ -591,14 +564,6 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     }
 
 
-    /**
-     * Move the top card of a CardStack to a new CardStack, starting all implied animation
-     *
-     * @param srcStack the source CardStack to move from
-     * @param dstStack the destination CardStack to move to
-     * @param duration the duration in milliseconds for the animation (pass zero for default duration)
-     * @param trackUndo flag to control whether move is tracked for undoing later
-     */
     private void moveSingleCard(CardStack srcStack, CardStack dstStack, int duration, boolean trackUndo) {
         if (srcStack == null) {
             return;
@@ -609,13 +574,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
         moveCardToStack(srcCard, srcStack, dstStack, duration, trackUndo);
     }
 
-    /**
-     * Determine if two cards can stack on a general stack
-     *
-     * @param topCard the Card to be placed on top
-     * @param bottomCard the Card that topCard will be placed on
-     * @return true if the cards can stack, otherwise false
-     */
+
     private boolean cardsCanStack(Card topCard, Card bottomCard) {
         boolean cardsCanStack = false;
 
@@ -634,15 +593,6 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     }
 
 
-    /**
-     * Move the top card of a CardStack to a new CardStack, starting all implied animation
-     *
-     * @param srcCard the Card to move
-     * @param srcStack the source CardStack to move from
-     * @param dstStack the destination CardStack to move to
-     * @param duration the duration in milliseconds for the animation (pass zero for default duration)
-     * @param trackUndo flag to control whether move is tracked for undoing later
-     */
     private void moveCardToStack(Card srcCard, CardStack srcStack, CardStack dstStack, int duration, boolean trackUndo) {
         if (srcCard == null || dstStack == null) {
             return;
@@ -690,9 +640,6 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     }
 
 
-    /**
-     * Move all cards from the general and freecell CardStacks to the ace stacks
-     */
     private void cleanupCards() {
         boolean movedCard = false;
         int duration = ANIM_MOVE_MIN;
@@ -724,13 +671,6 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     }
 
 
-    /**
-     * Move as many top cards as possible from one CardStack to another CardStack
-     *
-     * @param srcStack the source CardStack
-     * @param dstStack the destination CardStack
-     * @return true if one or more cards moved, false otherwise
-     */
     private boolean moveMultiCards(CardStack srcStack, CardStack dstStack) {
         // Sanity check
 
@@ -832,12 +772,6 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     }
 
 
-    /**
-     * Determine if a double-click occurred
-     *
-     * @param event the system MotionEvent
-     * @return true if a double-click was detected, false otherwise
-     */
     private boolean doubleClickOccured(MotionEvent event) {
         boolean doubleClickDetected = false;
 
@@ -857,11 +791,6 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     }
 
 
-    /**
-     * Test for and handle drag of card
-     *
-     * @param event the system MotionEvent
-     */
     private void doDrag(MotionEvent event) {
         if (mSrcCard == null) {
             return;
@@ -1096,12 +1025,6 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
         return bitmap;
     }
 
-    /**
-     * Support loading a bitmap from the app's assets; the bitmap is unpacked as ARGB_8888
-     *
-     * @param fileName is the name of the bitmap file to load
-     * @return the Bitmap object that contains the loaded bitmap or null if an error occurred while loading the bitmap
-     */
     public Bitmap getBitmap(String fileName) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
