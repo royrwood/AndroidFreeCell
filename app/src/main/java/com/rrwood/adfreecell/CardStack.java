@@ -69,6 +69,8 @@ public class CardStack {
 
     public void setVertOffset(int vertOffset) {
         this.cardVertOffset = vertOffset;
+
+        calcFullRect();
     }
 
     public void setBaseRect(int stackLeft, int stackTop, int stackRight, int stackBottom) {
@@ -82,14 +84,14 @@ public class CardStack {
             this.emptyStackSVImage.setRect(stackLeft, stackTop, stackRight, stackBottom);
         }
 
-        calcFullRect();
-
         int cardTop = stackTop;
         int cardHeight = stackBottom - stackTop;
         for (Card card : this.cards) {
             card.setRect(stackLeft, cardTop, stackRight, cardTop + cardHeight);
             cardTop += this.cardVertOffset;
         }
+
+        calcFullRect();
     }
 
     void calcFullRect() {
@@ -183,7 +185,8 @@ public class CardStack {
         calcFullRect();
     }
 
-    //    public void setLeftTop(int x, int y) {
+
+//    public void setLeftTop(int x, int y) {
 //        this.emptyStackSVImage.moveTo(x, y);
 //        this.emptyRect.offsetTo(x, y);
 //

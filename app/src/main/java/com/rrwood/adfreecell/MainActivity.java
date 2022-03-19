@@ -66,19 +66,15 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     private static final int ANIM_NEWGAME_DELTA = 20;
     private static final int ANIM_MOVE_MAX = 2000;
 
+    private final int NATURAL_SVG_CARD_WIDTH = 224;
+    private final int NATURAL_SVG_CARD_HEIGHT = 313;
+
     static final int NUMFREECELLSTACKS = 4;
     static final int NUMACESTACKS = 4;
     static final int NUMGENERALSTACKS = 8;
 
 
     private GameView gameView = null;
-    private final int naturalCardWidth = 224;
-    private final int naturalCardHeight = 313;
-    private int currentCardWidth = 0;
-    private int currentCardHeight = 0;
-    private int cardGridWidth = 0;
-    private int cardGridHeight = 0;
-    private int cardBorderSize = 0;
 
     private final Random random = new Random();
 
@@ -91,13 +87,10 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     private ArrayList<CardStack> generalStacks = null;
     private ArrayList<CardStack> allStacks = null;
 
-    private boolean didInitialNewGame = false;
-
     private ArrayList<CardMove> cardMoves = null;
 
     private SVGImage restartSVGImage = null;
     private SVGImage undoSVGImage = null;
-
 
     private CardStack mSrcStack = null;
     private CardStack.CardStackType mSrcStackType = null;
@@ -137,7 +130,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
         Point screenSize = new Point(dm.widthPixels, dm.heightPixels);
         Log.d(TAG,"onCreate: Screen size = (" + screenSize.x + "," + screenSize.y + ")");
 
-
+        // We need to access our app resources to get the SVG drawables
         Resources res = this.getApplicationContext().getResources();
 
         // Set up the restart icon
@@ -199,14 +192,18 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 
         // Create the general stacks (location will be set properly after GameView layout completes)
         this.generalStacks = new ArrayList<CardStack>();
-
         for (int i = 0; i < NUMGENERALSTACKS; i++) {
             CardStack cardStack = new CardStack(null, CardStack.CardStackType.GENERALSTACK, null);
-            cardStack.pushCard(this.cards.get(i % this.cards.size()), false);
             this.generalStacks.add(cardStack);
             this.allStacks.add(cardStack);
             this.gameView.addCardStack(cardStack);
         }
+
+        for (int i = 0; i < this.cards.size(); i++) {
+            CardStack cardStack = this.generalStacks.get(i % NUMGENERALSTACKS);
+            cardStack.pushCard(this.cards.get(i), false);
+        }
+
 
         Log.d(TAG,"onCreate: Finished onCreate");
     }
@@ -222,49 +219,49 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     }
 
 
-    @Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-	    // Handle item selection
-	    switch (item.getItemId()) {
-	        case R.id.action_settings:
-	            Log.d(TAG, "Menu item selected, id=R.id.action_settings");
-	            return true;
-	        case R.id.menu_action_2:
-	        	Log.d(TAG, "Menu item selected, id=R.id.menu_action_2");
-	            return true;
-	        default:
-	            return super.onOptionsItemSelected(item);
-	    }
-	}
-
-	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-	    super.onCreateContextMenu(menu, v, menuInfo);
-	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.context_menu, menu);
-	}
-
-	@Override
-	public boolean onContextItemSelected(MenuItem item) {
-	    AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-	    switch (item.getItemId()) {
-	        case R.id.context_menu_action_1:
-	        	Log.d(TAG, "Menu item selected, id=R.id.context_menu_action_1");
-	            return true;
-	        case R.id.context_menu_action_2:
-	        	Log.d(TAG, "Menu item selected, id=R.id.context_menu_action_2");
-	            return true;
-	        default:
-	            return super.onContextItemSelected(item);
-	    }
-	}
+//    @Override
+//	public boolean onCreateOptionsMenu(Menu menu) {
+//		// Inflate the menu; this adds items to the action bar if it is present.
+//		getMenuInflater().inflate(R.menu.main, menu);
+//		return true;
+//	}
+//
+//	@Override
+//	public boolean onOptionsItemSelected(MenuItem item) {
+//	    // Handle item selection
+//	    switch (item.getItemId()) {
+//	        case R.id.action_settings:
+//	            Log.d(TAG, "Menu item selected, id=R.id.action_settings");
+//	            return true;
+//	        case R.id.menu_action_2:
+//	        	Log.d(TAG, "Menu item selected, id=R.id.menu_action_2");
+//	            return true;
+//	        default:
+//	            return super.onOptionsItemSelected(item);
+//	    }
+//	}
+//
+//	@Override
+//	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+//	    super.onCreateContextMenu(menu, v, menuInfo);
+//	    MenuInflater inflater = getMenuInflater();
+//	    inflater.inflate(R.menu.context_menu, menu);
+//	}
+//
+//	@Override
+//	public boolean onContextItemSelected(MenuItem item) {
+//	    AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+//	    switch (item.getItemId()) {
+//	        case R.id.context_menu_action_1:
+//	        	Log.d(TAG, "Menu item selected, id=R.id.context_menu_action_1");
+//	            return true;
+//	        case R.id.context_menu_action_2:
+//	        	Log.d(TAG, "Menu item selected, id=R.id.context_menu_action_2");
+//	            return true;
+//	        default:
+//	            return super.onContextItemSelected(item);
+//	    }
+//	}
 
 
 	private void doDialog() {
@@ -809,13 +806,6 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     }
 
 
-    /**
-     * Determine if a card can move to a given CardStack
-     *
-     * @param card the Card to test
-     * @param dstStack the CardStack to test
-     * @return true if the Card is allowed to move to the CardStack, otherwise false
-     */
     private boolean cardCanMoveToStack(Card card, CardStack dstStack) {
         boolean cardCanMove = false;
 
@@ -851,6 +841,123 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
         return cardCanMove;
     }
 
+
+
+//    public Bitmap getBitmap(String fileName, BitmapFactory.Options options) {
+//        Bitmap bitmap = null;
+//
+//        try {
+//            AssetManager assets = getAssets();
+//            InputStream istream = assets.open(fileName);
+//            bitmap = BitmapFactory.decodeStream(istream, null, options);
+//            istream.close();
+//        } catch (IOException ex) {
+//            Log.e(TAG, "loadBitmap: Error loading bitmap " + fileName, ex);
+//        }
+//
+//        return bitmap;
+//    }
+//
+//    public Bitmap getBitmap(String fileName) {
+//        BitmapFactory.Options options = new BitmapFactory.Options();
+//        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+//
+//        return getBitmap(fileName, options);
+//    }
+
+    @Override
+    public void onAnimationUpdate(ValueAnimator animation) {
+        // Since a change has occurred, trigger a redraw of the entire GameView
+        gameView.postInvalidate();
+    }
+
+    @Override
+    public void onAnimationEnd(Animator animation) {
+        Card card = movingCards.get(animation);
+
+        if (card != null) {
+            Log.d(TAG,"onAnimationEnd: Ended move of card = " + card.getCardSuit().getName() + "," + card.getCardVal());
+            card.setMoving(false);
+            card.setMotionAnimation(null);
+        }
+
+        movingCards.remove(animation);
+    }
+
+    @Override
+    public void onAnimationRepeat(Animator anim) {
+        // Pass
+    }
+
+    @Override
+    public void onAnimationStart(Animator anim) {
+        // Pass
+    }
+
+    @Override
+    public void onAnimationCancel(Animator anim) {
+        // Pass
+    }
+
+    @Override
+    // Receive notification of changes in the position/size of the GameView
+    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+        Log.d(TAG,"onLayoutChange: (left,top,right,bottom) = (" + left + "," + top + "," + right + "," + bottom + ")");
+        Log.d(TAG,"onLayoutChange: (oldLeft,oldTop,oldRight,oldBottom) = (" + oldLeft + "," + oldTop + "," + oldRight + "," + oldBottom + ")");
+
+        int viewHeight = bottom - top;
+        int viewWidth = right - left;
+        int viewWidthHalf = viewWidth / 2;
+
+        int cardGridWidth = (viewWidth / NUMGENERALSTACKS + 1);
+        int cardGridHeight = (this.NATURAL_SVG_CARD_HEIGHT * cardGridWidth) / NATURAL_SVG_CARD_WIDTH;
+        int cardBorderSize = cardGridWidth / 8;
+        int currentCardWidth = cardGridWidth - 2 * cardBorderSize;
+        int currentCardHeight = (this.NATURAL_SVG_CARD_HEIGHT * currentCardWidth) / NATURAL_SVG_CARD_WIDTH;
+
+        // Position the restart and undo icons
+        int actionsSize = currentCardHeight / 2;
+        restartSVGImage.centerAt(viewWidthHalf, cardBorderSize + actionsSize / 2, actionsSize);
+        undoSVGImage.centerAt(viewWidthHalf, cardBorderSize + (3 * actionsSize ) / 2, actionsSize);
+
+        // Place the ace stacks
+        for (int i = 0; i < NUMACESTACKS; i++) {
+            int stackLeft = cardBorderSize + i * (currentCardWidth + cardBorderSize);
+            int stackRight = stackLeft + currentCardWidth;
+            int stackTop = cardBorderSize;
+            int stackBottom = stackTop + currentCardHeight;
+            CardStack cardStack = this.aceStacks.get(i);
+            cardStack.setBaseRect(stackLeft, stackTop, stackRight, stackBottom);
+        }
+
+        // Place the free cells
+        for (int i = 0; i < NUMFREECELLSTACKS; i++) {
+            int stackLeft = viewWidth -  (i + 1) * (currentCardWidth + cardBorderSize);
+            int stackRight = stackLeft + currentCardWidth;
+            int stackTop = cardBorderSize;
+            int stackBottom = stackTop + currentCardHeight;
+            CardStack cardStack = freecellStacks.get(i);
+            cardStack.setBaseRect(stackLeft, stackTop, stackRight, stackBottom);
+        }
+
+        // Place the general stacks
+        for (int i = 0; i < NUMGENERALSTACKS; i++) {
+            int stackLeft = i * cardGridWidth + cardBorderSize;
+            int stackRight = stackLeft + currentCardWidth;
+            int stackTop = cardGridHeight + cardBorderSize;
+            int stackBottom = stackTop + currentCardHeight;
+            CardStack cardStack = generalStacks.get(i);
+            cardStack.setVertOffset(currentCardHeight / 3);
+            cardStack.setBaseRect(stackLeft, stackTop, stackRight, stackBottom);
+        }
+
+//        if (!didInitialNewGame) {
+//            // Start a new game
+//            startGame(true);
+//
+//            didInitialNewGame = true;
+//        }
+    }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -1000,128 +1107,5 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
         }
 
         return handledEvent;
-    }
-
-
-    /**
-     * Support loading a bitmap from the app's assets
-     *
-     * @param fileName is the name of the bitmap file to load
-     * @param options is the Options object to use in loading the bitmap
-     * @return the Bitmap object that contains the loaded bitmap or null if an error occurred while loading the bitmap
-     */
-    public Bitmap getBitmap(String fileName, BitmapFactory.Options options) {
-        Bitmap bitmap = null;
-
-        try {
-            AssetManager assets = getAssets();
-            InputStream istream = assets.open(fileName);
-            bitmap = BitmapFactory.decodeStream(istream, null, options);
-            istream.close();
-        } catch (IOException ex) {
-            Log.e(TAG, "loadBitmap: Error loading bitmap " + fileName, ex);
-        }
-
-        return bitmap;
-    }
-
-    public Bitmap getBitmap(String fileName) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-
-        return getBitmap(fileName, options);
-    }
-
-    @Override
-    public void onAnimationUpdate(ValueAnimator animation) {
-        // Since a change has occurred, trigger a redraw of the entire GameView
-        gameView.postInvalidate();
-    }
-
-    @Override
-    public void onAnimationEnd(Animator animation) {
-        Card card = movingCards.get(animation);
-
-        if (card != null) {
-            Log.d(TAG,"onAnimationEnd: Ended move of card = " + card.getCardSuit().getName() + "," + card.getCardVal());
-            card.setMoving(false);
-            card.setMotionAnimation(null);
-        }
-
-        movingCards.remove(animation);
-    }
-
-    @Override
-    public void onAnimationRepeat(Animator anim) {
-        // Pass
-    }
-
-    @Override
-    public void onAnimationStart(Animator anim) {
-        // Pass
-    }
-
-    @Override
-    public void onAnimationCancel(Animator anim) {
-        // Pass
-    }
-
-    @Override
-    // Receive notification of changes in the position/size of the GameView
-    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-        Log.d(TAG,"onLayoutChange: (left,top,right,bottom) = (" + left + "," + top + "," + right + "," + bottom + ")");
-        Log.d(TAG,"onLayoutChange: (oldLeft,oldTop,oldRight,oldBottom) = (" + oldLeft + "," + oldTop + "," + oldRight + "," + oldBottom + ")");
-
-        int viewHeight = bottom - top;
-        int viewWidth = right - left;
-        int viewWidthHalf = viewWidth / 2;
-
-        this.cardGridWidth = (viewWidth / NUMGENERALSTACKS + 1);
-        this.cardGridHeight = (this.naturalCardHeight * this.cardGridWidth) / naturalCardWidth;
-        this.cardBorderSize = this.cardGridWidth / 8;
-        this.currentCardWidth = this.cardGridWidth - 2*this.cardBorderSize;
-        this.currentCardHeight = (this.naturalCardHeight * this.currentCardWidth) / naturalCardWidth;
-
-        // Position the restart and undo icons
-        int actionsSize = this.currentCardHeight / 2;
-        restartSVGImage.centerAt(viewWidthHalf, this.cardBorderSize + actionsSize / 2, actionsSize);
-        undoSVGImage.centerAt(viewWidthHalf, this.cardBorderSize + (3 * actionsSize ) / 2, actionsSize);
-
-        // Place the ace stacks
-        for (int i = 0; i < NUMACESTACKS; i++) {
-            int stackLeft = this.cardBorderSize + i * (this.currentCardWidth + this.cardBorderSize);
-            int stackRight = stackLeft + this.currentCardWidth;
-            int stackTop = this.cardBorderSize;
-            int stackBottom = stackTop + this.currentCardHeight;
-            CardStack cardStack = this.aceStacks.get(i);
-            cardStack.setBaseRect(stackLeft, stackTop, stackRight, stackBottom);
-        }
-
-        // Place the free cells
-        for (int i = 0; i < NUMFREECELLSTACKS; i++) {
-            int stackLeft = viewWidth -  (i + 1) * (this.currentCardWidth + this.cardBorderSize);
-            int stackRight = stackLeft + this.currentCardWidth;
-            int stackTop = this.cardBorderSize;
-            int stackBottom = stackTop + this.currentCardHeight;
-            CardStack cardStack = freecellStacks.get(i);
-            cardStack.setBaseRect(stackLeft, stackTop, stackRight, stackBottom);
-        }
-
-        // Place the general stacks
-        for (int i = 0; i < NUMGENERALSTACKS; i++) {
-            int stackLeft = i * this.cardGridWidth + this.cardBorderSize;
-            int stackRight = stackLeft + this.currentCardWidth;
-            int stackTop = this.cardGridHeight + this.cardBorderSize;
-            int stackBottom = stackTop + this.currentCardHeight;
-            CardStack cardStack = generalStacks.get(i);
-            cardStack.setBaseRect(stackLeft, stackTop, stackRight, stackBottom);
-        }
-
-//        if (!didInitialNewGame) {
-//            // Start a new game
-//            startGame(true);
-//
-//            didInitialNewGame = true;
-//        }
     }
 }

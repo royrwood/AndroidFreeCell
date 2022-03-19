@@ -33,12 +33,6 @@ public class Card {
 
     static final int NUM_CARDS_PER_SUIT = 13;
 
-    static final String stackBlue = "Blue_Back.png";
-    static final String stackClubs = "Clubs.png";
-    static final String stackHearts = "Hearts.png";
-    static final String stackDiamonds = "Diamonds.png";
-    static final String stackSpades = "Spades.png";
-
 
     enum CardSuitColour {
         BLACK, RED;
