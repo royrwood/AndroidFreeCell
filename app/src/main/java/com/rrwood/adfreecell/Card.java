@@ -1,11 +1,17 @@
 package com.rrwood.adfreecell;
 
 import android.animation.Animator;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.util.AttributeSet;
+
+import java.util.ArrayList;
 
 
 /**
@@ -81,13 +87,16 @@ public class Card {
     private Animator cardHiliteAnimation = null;
     private CardAction cardLastAction = CardAction.NO_ACTION;
     private int cardHiliteAlpha = 0;
-
+    private Paint hilitePaint = null;
 
     public Card(CardSuit cardSuit, int val, Drawable drawable) {
         this.cardSVImage = new SVGImage(drawable);
         this.cardRect = new Rect();
         this.cardSuit = cardSuit;
         this.cardVal = val;
+
+        this.hilitePaint = new Paint();
+        this.hilitePaint.setARGB(255, 240, 240, 0);
     }
 
     public CardSuit getCardSuit() {
@@ -168,6 +177,14 @@ public class Card {
     }
 
     public void drawCard(Canvas canvas) {
+        if (this.cardIsSrcCard) {
+            int alpha = this.getHiliteAlpha();
+            this.hilitePaint.setAlpha(alpha);
+            RectF hiliteRect = new RectF(this.cardRect);
+            hiliteRect.inset(-5.0f, -5.0f);
+            canvas.drawRoundRect(hiliteRect, 6.0f, 6.0f, this.hilitePaint);
+        }
+
         this.cardSVImage.drawSelf(canvas);
     }
 

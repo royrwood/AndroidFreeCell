@@ -118,3 +118,84 @@ public class GameView extends View {
 //        }
     }
 }
+
+
+/*
+@Override
+public void onDraw (Canvas canvas) {
+    // Clear background
+    canvas.drawARGB(0xFF, 0x00, 0x80, 0x00);
+
+    // Draw any icons
+    for (Icon icon : mIcons) {
+        Bitmap bitmap = icon.getBitmap();
+        Point pt = icon.getPt();
+
+        if (bitmap != null) {
+            canvas.drawBitmap(bitmap, pt.x, pt.y, null);
+        }
+    }
+
+
+    // Clear list of moving cards (they must be drawn after all the static cards!)
+    mMovingCards.clear();
+
+    // Draw each stack of cards
+    for (CardStack cardStack : mCardStacks) {
+        Point p = cardStack.getLeftTop();
+        Bitmap bitmap = cardStack.getBitmap();
+        ArrayList<Card> cards = cardStack.getCards();
+
+        // Hilight stack if necessary
+        if (cardStack.isHilighted()) {
+            mRectF.set(cardStack.getRect());
+            mRectF.inset(-3.0f, -3.0f);
+
+            mYellowPaint.setAlpha(255);
+            canvas.drawRoundRect(mRectF, 6.0f, 6.0f, mYellowPaint);
+        }
+
+        canvas.drawBitmap(bitmap, p.x, p.y, null);
+
+        for (Card card : cards) {
+            // Moving cards are drawn later, over top of all static cards
+            if (card.isMoving()) {
+                mMovingCards.add(card);
+            }
+            else {
+                drawCard(card, canvas);
+            }
+        }
+    }
+
+    // Draw cards that are in motion last so they are on top of everything else
+    for (Card c : mMovingCards) {
+        drawCard(c, canvas);
+    }
+}
+
+
+    private void drawCard(Card card, Canvas canvas) {
+        Point p = card.getLeftTop();
+        boolean isSrcCard = card.isSrcCard();
+        boolean isDstCard = card.isDstCard();
+        Bitmap bitmap = card.getBitmap();
+
+        if (isDstCard) {
+            int alpha = card.getHiliteAlpha();
+            mYellowPaint.setAlpha(alpha);
+            mRectF.set(card.getRect());
+            mRectF.inset(-5.0f, -5.0f);
+            canvas.drawRoundRect(mRectF, 6.0f, 6.0f, mYellowPaint);
+        }
+
+        if (isSrcCard) {
+            canvas.drawBitmap(bitmap, p.x, p.y, mGrayPaint);
+//			canvas.drawBitmap(bitmap, p.x, p.y, null);
+        }
+        else {
+            canvas.drawBitmap(bitmap, p.x, p.y, null);
+//			canvas.drawBitmap(bitmap, p.x, p.y, mLightPaint);
+        }
+    }
+ */
