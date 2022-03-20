@@ -430,26 +430,26 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
         this.currentlySelectedCardSuit = targetCard.getCardSuit();
 
         // Identify any cards that this source card can match
-//        for (CardStack tempStack : generalStacks) {
-//            ArrayList<Card> tempCards = tempStack.getCards();
-//
-//            for (Card card : tempCards) {
-//                if (cardsCanStack(targetCard, card)) {
-//                    card.setIsDstCard(true);
-//
-//                    ObjectAnimator animation = ObjectAnimator.ofObject(card, "cardHiliteAlpha", new IntEvaluator(), 0, 255);
-//                    animation.addUpdateListener(this);
-//                    animation.setDuration(500);
-//                    animation.setInterpolator(new DecelerateInterpolator());
-//                    animation.setRepeatCount(ValueAnimator.INFINITE);
-//                    animation.setRepeatMode(ValueAnimator.REVERSE);
-//
-//                    card.setHiliteAnimation(animation);
-//
-//                    animation.start();
-//                }
-//            }
-//        }
+        for (CardStack tempStack : generalStacks) {
+            ArrayList<Card> tempCards = tempStack.getCards();
+
+            for (Card card : tempCards) {
+                if (cardsCanStack(targetCard, card)) {
+                    card.setIsDstCard(true);
+
+                    ObjectAnimator animation = ObjectAnimator.ofObject(card, "cardHiliteAlpha", new IntEvaluator(), 0, 255);
+                    animation.addUpdateListener(this);
+                    animation.setDuration(500);
+                    animation.setInterpolator(new DecelerateInterpolator());
+                    animation.setRepeatCount(ValueAnimator.INFINITE);
+                    animation.setRepeatMode(ValueAnimator.REVERSE);
+
+                    card.setHiliteAnimation(animation);
+
+                    animation.start();
+                }
+            }
+        }
 
         this.gameView.postInvalidate();
     }

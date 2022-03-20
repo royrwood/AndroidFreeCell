@@ -175,13 +175,12 @@ public class Card {
     }
 
     public void drawCard(Canvas canvas) {
-//        if (this.cardIsSrcCard) {
-//            int alpha = this.getHiliteAlpha();
-//            this.hilitePaint.setAlpha(alpha);
-//            RectF hiliteRect = new RectF(this.cardRect);
-//            hiliteRect.inset(-5.0f, -5.0f);
-//            canvas.drawRoundRect(hiliteRect, 6.0f, 6.0f, this.hilitePaint);
-//        }
+        if (this.cardIsDstCard) {
+            this.hilitePaint.setAlpha(this.cardHiliteAlpha);
+            RectF hiliteRect = new RectF(this.cardRect);
+            hiliteRect.inset(-5.0f, -5.0f);
+            canvas.drawRoundRect(hiliteRect, 6.0f, 6.0f, this.hilitePaint);
+        }
 
         if (this.cardIsSrcCard) {
             this.cardSVImage.drawSelf(canvas, this.grayPaint);
@@ -222,7 +221,7 @@ public class Card {
     }
 
     public int getCardHiliteAlpha() {
-        return cardHiliteAlpha;
+        return this.cardHiliteAlpha;
     }
 
     public void setCardHiliteAlpha(int cardHiliteAlpha) {
