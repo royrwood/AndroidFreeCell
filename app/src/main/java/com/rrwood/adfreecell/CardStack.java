@@ -3,8 +3,10 @@ package com.rrwood.adfreecell;
 import java.util.ArrayList;
 
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Point;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
@@ -23,7 +25,8 @@ public class CardStack {
     private Rect baseRect = null;
     private Rect fullRect = null;
     private int cardVertOffset = 0;
-//    private boolean isHilighted = false;
+    private boolean isHilighted = false;
+    private Paint hilitePaint = null;
 
 
     public CardStack(Card.CardSuit suit, CardStackType stackType, Drawable emptyStackDrawable) {
@@ -36,16 +39,19 @@ public class CardStack {
         if (emptyStackDrawable != null) {
             this.emptyStackSVImage = new SVGImage(emptyStackDrawable);
         }
+
+        this.hilitePaint = new Paint();
+        this.hilitePaint.setARGB(255, 240, 240, 0);
     }
 
 
-//    public boolean isHilighted() {
-//        return this.isHilighted;
-//    }
-//
-//    public void setIsHilighted(boolean isHilighted) {
-//        this.isHilighted = isHilighted;
-//    }
+    public boolean isHilighted() {
+        return this.isHilighted;
+    }
+
+    public void setIsHilighted(boolean isHilighted) {
+        this.isHilighted = isHilighted;
+    }
 
     public Rect getRect() {
         return new Rect(fullRect);
@@ -108,18 +114,20 @@ public class CardStack {
     }
 
     public void drawStaticCards(Canvas canvas) {
-        int numCards = this.cards.size();
-
-        if (numCards == 0) {
-            if (this.emptyStackSVImage != null) {
-                this.emptyStackSVImage.drawSelf(canvas);
-            }
+        if (this.isHilighted()) {
+            RectF hiliteRect = new RectF(this.fullRect.left - 3, this.fullRect.top - 3, this.fullRect.right + 3, this.fullRect.bottom + 3);
+            this.hilitePaint.setAlpha(255);
+            canvas.drawRoundRect(hiliteRect, 6.0f, 6.0f, this.hilitePaint);
         }
-        else {
-            for (Card card : this.cards) {
-                if (!card.isMoving()) {
-                    card.drawCard(canvas);
-                }
+
+        // Always draw empty stack image, since a card could be in motion and not yet landed on the stack
+        if (this.emptyStackSVImage != null) {
+            this.emptyStackSVImage.drawSelf(canvas);
+        }
+
+        for (Card card : this.cards) {
+            if (!card.isMoving()) {
+                card.drawCard(canvas);
             }
         }
     }

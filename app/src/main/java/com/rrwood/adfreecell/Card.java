@@ -170,8 +170,8 @@ public class Card {
         return this.cardRect.right - this.cardRect.left;
     }
 
-    public void moveTo(int x, int y) {
-        cardRect.offsetTo(x, y);
+    public void moveTo(int left, int top) {
+        this.setCardRect(left, top, left + this.getWidth(), top + this.getHeight());
     }
 
     public void drawCard(Canvas canvas) {
