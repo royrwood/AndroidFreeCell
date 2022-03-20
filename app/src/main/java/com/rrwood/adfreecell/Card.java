@@ -12,6 +12,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -80,6 +81,7 @@ public class Card {
 
     private CardSuit cardSuit = null;
     private int cardVal = -1;
+
     private Rect cardRect = null;
     private SVGImage cardSVImage = null;
     private boolean cardIsMoving = false;
@@ -170,19 +172,6 @@ public class Card {
         cardRect.offsetTo(x, y);
     }
 
-    public Rect getRect() {
-        return new Rect(cardRect);
-    }
-
-    public void setRect(int cardLeft, int cardTop, int cardRight, int cardBottom) {
-        if (this.cardRect.left == cardLeft && this.cardRect.right == cardTop && this.cardRect.top == cardRight && this.cardRect.bottom == cardBottom) {
-            return;
-        }
-
-        this.cardRect.set(cardLeft, cardTop, cardRight, cardBottom);
-        this.cardSVImage.setRect(cardLeft, cardTop, cardRight, cardBottom);
-    }
-
     public void drawCard(Canvas canvas) {
 //        if (this.cardIsSrcCard) {
 //            int alpha = this.getHiliteAlpha();
@@ -211,12 +200,30 @@ public class Card {
     public void setLastAction(CardAction action) {
         cardLastAction = action;
     }
+    public Rect getCardRect() {
+        // We need to return the actual Rect, not a copy, since it is used by the ObjectAnimator during card motion
+        return cardRect;
+    }
 
-    public int getHiliteAlpha() {
+    public void setCardRect(Rect cardRect) {
+        this.cardRect = cardRect;
+    }
+
+    public void setCardRect(int left, int top, int right, int bottom) {
+        Log.d("== CARD ==","setCardRect: Moving card, left=" + left);
+        if (this.cardRect.left == left && this.cardRect.right == right && this.cardRect.top == top && this.cardRect.bottom == bottom) {
+            return;
+        }
+
+        this.cardRect.set(left, top, right, bottom);
+        this.cardSVImage.setRect(left, top, right, bottom);
+    }
+
+    public int getCardHiliteAlpha() {
         return cardHiliteAlpha;
     }
 
-    public void setHiliteAlpha(int alpha) {
-        cardHiliteAlpha = alpha;
+    public void setCardHiliteAlpha(int cardHiliteAlpha) {
+        this.cardHiliteAlpha = cardHiliteAlpha;
     }
 }

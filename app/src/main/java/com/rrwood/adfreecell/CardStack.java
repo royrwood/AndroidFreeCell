@@ -87,7 +87,7 @@ public class CardStack {
         int cardTop = stackTop;
         int cardHeight = stackBottom - stackTop;
         for (Card card : this.cards) {
-            card.setRect(stackLeft, cardTop, stackRight, cardTop + cardHeight);
+            card.setCardRect(stackLeft, cardTop, stackRight, cardTop + cardHeight);
             cardTop += this.cardVertOffset;
         }
 
@@ -125,7 +125,11 @@ public class CardStack {
     }
 
     public void drawMovingCards(Canvas canvas) {
-
+        for (Card card : this.cards) {
+            if (card.isMoving()) {
+                card.drawCard(canvas);
+            }
+        }
     }
 
     public Point getLeftTop() {

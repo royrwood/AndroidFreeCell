@@ -433,7 +433,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
                 if (cardsCanStack(targetCard, card)) {
                     card.setIsDstCard(true);
 
-                    ObjectAnimator animation = ObjectAnimator.ofObject(card, "hiliteAlpha", new IntEvaluator(), 0, 255);
+                    ObjectAnimator animation = ObjectAnimator.ofObject(card, "cardHiliteAlpha", new IntEvaluator(), 0, 255);
                     animation.addUpdateListener(this);
                     animation.setDuration(500);
                     animation.setInterpolator(new DecelerateInterpolator());
@@ -596,14 +596,14 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
             currentAnimation.cancel();
         }
 
-        Rect currentRect = srcCard.getRect();
+        Rect currentRect = srcCard.getCardRect();
         Point topLeft = dstStack.getNextCardLocation();
         Rect finalRect = new Rect(topLeft.x, topLeft.y, topLeft.x + srcCard.getWidth(), topLeft.y + srcCard.getHeight());
 
         dstStack.pushCard(srcCard, false);
 
         ObjectAnimator animation = null;
-        animation = ObjectAnimator.ofObject(srcCard, "rect", new RectEvaluator(), currentRect, finalRect);
+        animation = ObjectAnimator.ofObject(srcCard, "cardRect", new RectEvaluator(), currentRect, finalRect);
         animation.addUpdateListener(this);
         animation.addListener(this);
         animation.setDuration(duration);
@@ -996,7 +996,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 //            // Move single card from one stack to another stack
 //            if (cardCanMoveToStack(srcCard, targetStack)) {
 //                Log.d(TAG,"onTouch: Move single card");
-//                moveSingleCard(srcStack, targetStack, 0, true);
+//                moveSingleCard(this.currentlySelectedCardStack, targetStack, 0, true);
 //                clearSrcCardStack();
 //                clearDstCardStack();
 //            }
@@ -1008,20 +1008,18 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 //
 //            handledEvent = true;
 //        }
-//        else if (srcAndDstAreGeneral && event.getAction() == MotionEvent.ACTION_DOWN) {
-//            // Move from one general stack to another (i.e. possible run move)
-//            Log.d(TAG,"onTouch: Move between general stacks");
-//            if (moveMultiCards(srcStack, targetStack)) {
-//                clearSrcCardStack();
-//                clearDstCardStack();
-//            }
-//            else {
-//                selectSrcCardStack(targetStack);
-//                clearDstCardStack();
-//            }
-//
-//            handledEvent = true;
-//        }
+        else if (srcAndDstAreGeneral && event.getAction() == MotionEvent.ACTION_DOWN) {
+            // Move from one general stack to another (i.e. possible run move)
+            Log.d(TAG,"onTouch: Move between general stacks");
+            if (moveMultiCards(this.currentlySelectedCardStack, targetStack)) {
+                clearSrcCardStack();
+            }
+            else {
+                selectSrcCardStack(targetStack);
+            }
+            clearDstCardStack();
+            handledEvent = true;
+        }
         else if (targetStack != null && event.getAction() == MotionEvent.ACTION_DOWN) {
             // Select target card
             Log.d(TAG,"onTouch: Select card");
@@ -1064,16 +1062,16 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 ////			if (cardCanMoveToStack(mSrcCard, targetStack)) {
 //
 //            // For debugging, allow drop of card anywhere
-//            if (targetStack != null && targetStack != srcStack) {
+//            if (targetStack != null && targetStack != this.currentlySelectedCardStack) {
 //
 //                Log.d(TAG,"onTouch: Stack drag-drop new location");
-//                moveSingleCard(srcStack, targetStack, 0, true);
+//                moveSingleCard(this.currentlySelectedCardStack, targetStack, 0, true);
 //                clearSrcCardStack();
 //                clearDstCardStack();
 //            }
 //            else {
 //                Log.d(TAG,"onTouch: Stack drag-drop old location");
-//                moveSingleCard(srcStack, srcStack, 0, true);
+//                moveSingleCard(this.currentlySelectedCardStack, this.currentlySelectedCardStack, 0, true);
 //                clearDstCardStack();
 //            }
 //
