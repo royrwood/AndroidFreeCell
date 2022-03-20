@@ -111,55 +111,55 @@ public class Card {
     }
 
     public CardSuit getCardSuit() {
-        return cardSuit;
+        return this.cardSuit;
     }
 
     public CardSuitColour getSuitColour() {
-        return cardSuit.getColour();
+        return this.cardSuit.getColour();
     }
 
     public int getCardVal() {
-        return cardVal;
+        return this.cardVal;
     }
 
     public boolean isMoving() {
-        return cardIsMoving;
+        return this.cardIsMoving;
     }
 
     public void setMoving(boolean moving) {
-        cardIsMoving = moving;
+        this.cardIsMoving = moving;
     }
 
     public Animator getMotionAnimation() {
-        return cardMotionAnimation;
+        return this.cardMotionAnimation;
     }
 
     public void setMotionAnimation(Animator animation) {
-        cardMotionAnimation = animation;
+        this.cardMotionAnimation = animation;
     }
 
     public Animator getHiliteAnimation() {
-        return cardHiliteAnimation;
+        return this.cardHiliteAnimation;
     }
 
     public void setHiliteAnimation(Animator animation) {
-        cardHiliteAnimation = animation;
+        this.cardHiliteAnimation = animation;
     }
 
     public boolean isSrcCard() {
-        return cardIsSrcCard;
+        return this.cardIsSrcCard;
     }
 
     public void setIsSrcCard(boolean hilite) {
-        cardIsSrcCard = hilite;
+        this.cardIsSrcCard = hilite;
     }
 
     public boolean isDstCard() {
-        return cardIsDstCard;
+        return this.cardIsDstCard;
     }
 
     public void setIsDstCard(boolean hilite) {
-        cardIsDstCard = hilite;
+        this.cardIsDstCard = hilite;
     }
 
     public int getHeight() {
@@ -192,16 +192,17 @@ public class Card {
     }
 
     public boolean contains(int x, int y) {
-        return cardRect.contains(x, y);
+        return this.cardRect.contains(x, y);
     }
 
     public CardAction getLastAction() {
-        return cardLastAction;
+        return this.cardLastAction;
     }
 
     public void setLastAction(CardAction action) {
-        cardLastAction = action;
+        this.cardLastAction = action;
     }
+
     public Rect getCardRect() {
         return new Rect(this.cardRect);
     }

@@ -832,29 +832,6 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     }
 
 
-
-//    public Bitmap getBitmap(String fileName, BitmapFactory.Options options) {
-//        Bitmap bitmap = null;
-//
-//        try {
-//            AssetManager assets = getAssets();
-//            InputStream istream = assets.open(fileName);
-//            bitmap = BitmapFactory.decodeStream(istream, null, options);
-//            istream.close();
-//        } catch (IOException ex) {
-//            Log.e(TAG, "loadBitmap: Error loading bitmap " + fileName, ex);
-//        }
-//
-//        return bitmap;
-//    }
-//
-//    public Bitmap getBitmap(String fileName) {
-//        BitmapFactory.Options options = new BitmapFactory.Options();
-//        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-//
-//        return getBitmap(fileName, options);
-//    }
-
     @Override
     public void onAnimationUpdate(ValueAnimator animation) {
         // Since a change has occurred, trigger a redraw of the entire GameView
