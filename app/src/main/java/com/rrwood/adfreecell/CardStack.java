@@ -3,6 +3,7 @@ package com.rrwood.adfreecell;
 import java.util.ArrayList;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Point;
@@ -123,6 +124,16 @@ public class CardStack {
         // Always draw empty stack image, since a card could be in motion and not yet landed on the stack
         if (this.emptyStackSVImage != null) {
             this.emptyStackSVImage.drawSelf(canvas);
+        }
+        else {
+            Paint outLinePaint = new Paint();
+            outLinePaint.setColor(Color.BLACK);
+            outLinePaint.setStyle(Paint.Style.STROKE);
+            outLinePaint.setStrokeWidth(2);
+
+            RectF insetRect = new RectF(this.baseRect);
+            insetRect.inset(5.0f, 5.0f);
+            canvas.drawRoundRect(insetRect, 6.0f, 6.0f, outLinePaint);
         }
 
         for (Card card : this.cards) {
