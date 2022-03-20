@@ -21,6 +21,8 @@ import java.util.ArrayList;
  * A class representing a playing card
  */
 public class Card {
+    static final String TAG = "Card";
+
     static final String SUIT_NAME_CLUBS = "Clubs";
     static final String SUIT_NAME_HEARTS = "Hearts";
     static final String SUIT_NAME_DIAMONDS = "Diamonds";
@@ -201,16 +203,15 @@ public class Card {
         cardLastAction = action;
     }
     public Rect getCardRect() {
-        // We need to return the actual Rect, not a copy, since it is used by the ObjectAnimator during card motion
-        return cardRect;
+        return new Rect(this.cardRect);
     }
 
     public void setCardRect(Rect cardRect) {
-        this.cardRect = cardRect;
+        this.setCardRect(cardRect.left, cardRect.top, cardRect.right, cardRect.bottom);
     }
 
     public void setCardRect(int left, int top, int right, int bottom) {
-        Log.d("== CARD ==","setCardRect: Moving card, left=" + left);
+        Log.d(TAG,"setCardRect: Moving card, left=" + left);
         if (this.cardRect.left == left && this.cardRect.right == right && this.cardRect.top == top && this.cardRect.bottom == bottom) {
             return;
         }

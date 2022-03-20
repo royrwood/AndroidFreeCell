@@ -75,6 +75,8 @@ public class GameView extends View {
 
     @Override
     public void onDraw (Canvas canvas) {
+        Log.d(TAG,"onDraw: Redrawing...");
+
         // Clear background
         canvas.drawARGB(0xFF, 0x00, 0x80, 0x00);
 
