@@ -17,12 +17,12 @@ import static com.rrwood.adfreecell.CardSVGSuitValueInfo.CardAction;
 
 public class Card {
     static final String TAG = "Card";
-    static private Paint hilitePaint = null;
+    static private Paint highlightPaint = null;
     static private Paint grayPaint = null;
 
     static {
-        Card.hilitePaint = new Paint();
-        Card.hilitePaint.setARGB(255, 240, 240, 0);
+        Card.highlightPaint = new Paint();
+        Card.highlightPaint.setARGB(255, 240, 240, 0);
 
         ColorFilter filter = new LightingColorFilter(0xffdddddd, 0);
         Card.grayPaint = new Paint();
@@ -38,9 +38,9 @@ public class Card {
     private boolean cardIsSrcCard = false;
     private boolean cardIsDstCard = false;
     private Animator cardMotionAnimation = null;
-    private Animator cardHiliteAnimation = null;
+    private Animator cardHighlightAnimation = null;
     private CardAction cardLastAction = CardAction.NO_ACTION;
-    private int cardHiliteAlpha = 0;
+    private int cardHighlightAlpha = 0;
 
     public Card(CardSuit cardSuit, int val, Drawable drawable) {
         this.cardSVImage = new SVGImage(drawable);
@@ -77,12 +77,12 @@ public class Card {
         this.cardMotionAnimation = animation;
     }
 
-    public Animator getHiliteAnimation() {
-        return this.cardHiliteAnimation;
+    public Animator getHighlightAnimation() {
+        return this.cardHighlightAnimation;
     }
 
-    public void setHiliteAnimation(Animator animation) {
-        this.cardHiliteAnimation = animation;
+    public void setHighlightAnimation(Animator animation) {
+        this.cardHighlightAnimation = animation;
     }
 
     public boolean isSrcCard() {
@@ -115,10 +115,10 @@ public class Card {
 
     public void drawCard(Canvas canvas) {
         if (this.cardIsDstCard) {
-            Card.hilitePaint.setAlpha(this.cardHiliteAlpha);
-            RectF hiliteRect = new RectF(this.cardRect);
-            hiliteRect.inset(-5.0f, -5.0f);
-            canvas.drawRoundRect(hiliteRect, 6.0f, 6.0f, Card.hilitePaint);
+            Card.highlightPaint.setAlpha(this.cardHighlightAlpha);
+            RectF highlightRect = new RectF(this.cardRect);
+            highlightRect.inset(-5.0f, -5.0f);
+            canvas.drawRoundRect(highlightRect, 6.0f, 6.0f, Card.highlightPaint);
         }
 
         if (this.cardIsSrcCard) {
@@ -159,11 +159,11 @@ public class Card {
         this.cardSVImage.setRect(left, top, right, bottom);
     }
 
-    public int getCardHiliteAlpha() {
-        return this.cardHiliteAlpha;
+    public int getCardHighlightAlpha() {
+        return this.cardHighlightAlpha;
     }
 
-    public void setCardHiliteAlpha(int cardHiliteAlpha) {
-        this.cardHiliteAlpha = cardHiliteAlpha;
+    public void setCardHighlightAlpha(int cardHighlightAlpha) {
+        this.cardHighlightAlpha = cardHighlightAlpha;
     }
 }

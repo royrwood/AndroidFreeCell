@@ -356,7 +356,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 
     private void clearDstCardStack() {
         if (dstStack != null) {
-            dstStack.setIsHilighted(false);
+            dstStack.setIsHighlighted(false);
             dstStack = null;
 
             if (gameView != null) {
@@ -371,7 +371,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 
         if (stack != null) {
             dstStack = stack;
-            dstStack.setIsHilighted(true);
+            dstStack.setIsHighlighted(true);
 
             if (gameView != null) {
                 gameView.postInvalidate();
@@ -386,11 +386,11 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
             if (card.isDstCard()) {
                 card.setIsDstCard(false);
 
-                Animator anim = card.getHiliteAnimation();
+                Animator anim = card.getHighlightAnimation();
 
                 if (anim != null) {
                     anim.cancel();
-                    card.setHiliteAnimation(null);
+                    card.setHighlightAnimation(null);
                 }
             }
         }
@@ -448,7 +448,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
                     animation.setRepeatCount(ValueAnimator.INFINITE);
                     animation.setRepeatMode(ValueAnimator.REVERSE);
 
-                    card.setHiliteAnimation(animation);
+                    card.setHighlightAnimation(animation);
 
                     animation.start();
                 }
