@@ -11,6 +11,8 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
+import static com.rrwood.adfreecell.CardSVGSuitValueInfo.CardSuit;
+
 
 public class CardStack {
     enum CardStackType {
@@ -18,19 +20,24 @@ public class CardStack {
     }
 
     private static final String TAG = "ROYDEBUG.CardStack";
+    private static Paint hilitePaint = null;
+
+    static {
+        CardStack.hilitePaint = new Paint();
+        CardStack.hilitePaint.setARGB(255, 240, 240, 0);
+    }
 
     private SVGImage emptyStackSVImage = null;
-    private Card.CardSuit stackSuit = null;
-    private CardStackType stackType = null;
-    private ArrayList<Card> cards = null;
-    private Rect baseRect = null;
-    private Rect fullRect = null;
+    private CardSuit stackSuit;
+    private CardStackType stackType;
+    private ArrayList<Card> cards;
+    private Rect baseRect;
+    private Rect fullRect;
     private int cardVertOffset = 0;
     private boolean isHilighted = false;
-    private Paint hilitePaint = null;
 
 
-    public CardStack(Card.CardSuit suit, CardStackType stackType, Drawable emptyStackDrawable) {
+    public CardStack(CardSuit suit, CardStackType stackType, Drawable emptyStackDrawable) {
         this.stackSuit = suit;
         this.stackType = stackType;
         this.cards = new ArrayList<>();
@@ -41,8 +48,6 @@ public class CardStack {
             this.emptyStackSVImage = new SVGImage(emptyStackDrawable);
         }
 
-        this.hilitePaint = new Paint();
-        this.hilitePaint.setARGB(255, 240, 240, 0);
     }
 
 
@@ -58,7 +63,7 @@ public class CardStack {
         return new Rect(fullRect);
     }
 
-    public Card.CardSuit getSuit() {
+    public CardSuit getSuit() {
         return this.stackSuit;
     }
 
@@ -117,8 +122,8 @@ public class CardStack {
     public void drawStaticCards(Canvas canvas) {
         if (this.isHilighted()) {
             RectF hiliteRect = new RectF(this.fullRect.left - 3, this.fullRect.top - 3, this.fullRect.right + 3, this.fullRect.bottom + 3);
-            this.hilitePaint.setAlpha(255);
-            canvas.drawRoundRect(hiliteRect, 6.0f, 6.0f, this.hilitePaint);
+            CardStack.hilitePaint.setAlpha(255);
+            canvas.drawRoundRect(hiliteRect, 6.0f, 6.0f, CardStack.hilitePaint);
         }
 
         // Always draw empty stack image, since a card could be in motion and not yet landed on the stack
@@ -189,7 +194,6 @@ public class CardStack {
         return topCard;
     }
 
-
     public Card topCard() {
         Card topCard = null;
         int numCards = this.cards.size();
@@ -201,21 +205,9 @@ public class CardStack {
         return topCard;
     }
 
-
     public void removeAllCards() {
         this.cards.clear();
 
         calcFullRect();
     }
-
-
-//    public void setLeftTop(int x, int y) {
-//        this.emptyStackSVImage.moveTo(x, y);
-//        this.emptyRect.offsetTo(x, y);
-//
-//        for (Card c : this.cards) {
-//            c.moveTo(x, y);
-//            y += this.cardVertOffset;
-//        }
-//    }
 }
