@@ -97,7 +97,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     private CardStack.CardStackType currentlySelectedCardStackType = null;
 
     // TODO: DO I need this?
-    private CardStack dstStack = null;
+//    private CardStack dstStack = null;
 
     private AudioPlayer audioPlayer = null;
 
@@ -334,7 +334,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 
         // Clear card selections
         clearSrcCardStack();
-        clearDstCardStack();
+//        clearDstCardStack();
 
         // Shuffle cards?
         if (shuffleCards) {
@@ -358,30 +358,30 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     }
 
 
-    private void clearDstCardStack() {
-        if (dstStack != null) {
-            dstStack.setIsHighlighted(false);
-            dstStack = null;
-
-            if (gameView != null) {
-                gameView.postInvalidate();
-            }
-        }
-    }
-
-
-    private void selectDstCardStack(CardStack stack) {
-        clearDstCardStack();
-
-        if (stack != null) {
-            dstStack = stack;
-            dstStack.setIsHighlighted(true);
-
-            if (gameView != null) {
-                gameView.postInvalidate();
-            }
-        }
-    }
+//    private void clearDstCardStack() {
+//        if (dstStack != null) {
+//            dstStack.setIsHighlighted(false);
+//            dstStack = null;
+//
+//            if (gameView != null) {
+//                gameView.postInvalidate();
+//            }
+//        }
+//    }
+//
+//
+//    private void selectDstCardStack(CardStack stack) {
+//        clearDstCardStack();
+//
+//        if (stack != null) {
+//            dstStack = stack;
+//            dstStack.setIsHighlighted(true);
+//
+//            if (gameView != null) {
+//                gameView.postInvalidate();
+//            }
+//        }
+//    }
 
 
     private void clearSrcCardStack() {
@@ -502,45 +502,45 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     }
 
 
-    private CardStack findDstGeneralStack(Card card) {
-        CardStack generalStack = null;
-        CardSuitColour cardColour = card.getSuitColour();
-        int cardVal = card.getCardVal();
-
-        for (CardStack stack : generalStacks) {
-            Card topCard = stack.topCard();
-
-            if (topCard == null) {
-                generalStack = stack;
-                break;
-            }
-
-            CardSuitColour topCardSuitColour = topCard.getSuitColour();
-            int topCardVal = topCard.getCardVal();
-
-            if (cardColour != topCardSuitColour && cardVal == topCardVal - 1) {
-                generalStack = stack;
-                break;
-            }
-        }
-
-        return generalStack;
-    }
-
-
-    private CardStack findEmptyFreecellStack() {
-        CardStack freecellStack = null;
-
-        for (CardStack stack : freecellStacks) {
-            if (stack.getNumCards() <= 0) {
-                freecellStack = stack;
-
-                break;
-            }
-        }
-
-        return freecellStack;
-    }
+//    private CardStack findDstGeneralStack(Card card) {
+//        CardStack generalStack = null;
+//        CardSuitColour cardColour = card.getSuitColour();
+//        int cardVal = card.getCardVal();
+//
+//        for (CardStack stack : generalStacks) {
+//            Card topCard = stack.topCard();
+//
+//            if (topCard == null) {
+//                generalStack = stack;
+//                break;
+//            }
+//
+//            CardSuitColour topCardSuitColour = topCard.getSuitColour();
+//            int topCardVal = topCard.getCardVal();
+//
+//            if (cardColour != topCardSuitColour && cardVal == topCardVal - 1) {
+//                generalStack = stack;
+//                break;
+//            }
+//        }
+//
+//        return generalStack;
+//    }
+//
+//
+//    private CardStack findEmptyFreecellStack() {
+//        CardStack freecellStack = null;
+//
+//        for (CardStack stack : freecellStacks) {
+//            if (stack.getNumCards() <= 0) {
+//                freecellStack = stack;
+//
+//                break;
+//            }
+//        }
+//
+//        return freecellStack;
+//    }
 
 
     private void undoMove() {
@@ -604,8 +604,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 
         dstStack.pushCard(srcCard, false);
 
-        ObjectAnimator animation = null;
-        animation = ObjectAnimator.ofObject(srcCard, "cardRect", new RectEvaluator(), currentRect, finalRect);
+        ObjectAnimator animation = ObjectAnimator.ofObject(srcCard, "cardRect", new RectEvaluator(), currentRect, finalRect);
         animation.addUpdateListener(this);
         animation.addListener(this);
         animation.setDuration(duration);
@@ -894,7 +893,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
         int cardBorderSize = cardGridWidth / 8;
         int currentCardWidth = cardGridWidth - 2 * cardBorderSize;
         int currentCardHeight = (this.NATURAL_SVG_CARD_HEIGHT * currentCardWidth) / NATURAL_SVG_CARD_WIDTH;
-        int generalStackHorizSpacing = (viewWidth - NUMGENERALSTACKS * currentCardWidth) / (NUMGENERALSTACKS + 1);
+//        int generalStackHorizSpacing = (viewWidth - NUMGENERALSTACKS * currentCardWidth) / (NUMGENERALSTACKS + 1);
 
         // Position the restart and undo icons
         int actionsSize = currentCardHeight / 2;
@@ -967,7 +966,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
             // Double-click in blank space means auto-move
             Log.d(TAG,"onTouch: Auto-move");
             clearSrcCardStack();
-            clearDstCardStack();
+//            clearDstCardStack();
             cleanupCards();
             handledEvent = true;
         }
@@ -975,7 +974,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
             // Clear selection
             Log.d(TAG,"onTouch: Clear selection");
             clearSrcCardStack();
-            clearDstCardStack();
+//            clearDstCardStack();
 
             // Don't eat this event-- if we do, then context menu won't show...
             // handledEvent = true;
@@ -986,12 +985,12 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
                 Log.d(TAG,"onTouch: Move single card");
                 moveTopCardFromSrcStackToDstStack(this.currentlySelectedCardStack, targetStack, 0, true);
                 clearSrcCardStack();
-                clearDstCardStack();
+//                clearDstCardStack();
             }
             else {
                 Log.d(TAG,"onTouch: Ignoring invalid single-card move");
                 selectSrcCardStack(targetStack);
-                clearDstCardStack();
+//                clearDstCardStack();
             }
 
             handledEvent = true;
@@ -1005,14 +1004,14 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
             else {
                 selectSrcCardStack(targetStack);
             }
-            clearDstCardStack();
+//            clearDstCardStack();
             handledEvent = true;
         }
         else if (targetStack != null && event.getAction() == MotionEvent.ACTION_DOWN) {
             // Select target card
             Log.d(TAG,"onTouch: Select card");
             selectSrcCardStack(targetStack);
-            clearDstCardStack();
+//            clearDstCardStack();
 
             handledEvent = true;
         }
@@ -1029,13 +1028,13 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
                 Log.d(TAG,"onTouch: Drag card begins");
                 doDrag(event);
 
-                if (targetStack != this.currentlySelectedCardStack) {
-                    selectDstCardStack(targetStack);
-                }
+//                if (targetStack != this.currentlySelectedCardStack) {
+//                    selectDstCardStack(targetStack);
+//                }
             }
             else {
                 Log.d(TAG,"onTouch: Ignoring drag within card current location");
-                clearDstCardStack();
+//                clearDstCardStack();
             }
 
             handledEvent = true;
@@ -1045,9 +1044,9 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
             Log.d(TAG,"onTouch: Drag card continues");
             doDrag(event);
 
-            if (targetStack != this.currentlySelectedCardStack) {
-                selectDstCardStack(targetStack);
-            }
+//            if (targetStack != this.currentlySelectedCardStack) {
+//                selectDstCardStack(targetStack);
+//            }
 
             handledEvent = true;
         }
@@ -1064,7 +1063,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
                 moveTopCardFromSrcStackToDstStack(this.currentlySelectedCardStack, this.currentlySelectedCardStack, 0, true);
             }
 
-            clearDstCardStack();
+//            clearDstCardStack();
 
             handledEvent = true;
         }

@@ -19,12 +19,13 @@ public class CardStack {
     }
 
     private static final String TAG = "ROYDEBUG.CardStack";
-    private static Paint highlightPaint = null;
 
-    static {
-        CardStack.highlightPaint = new Paint();
-        CardStack.highlightPaint.setARGB(255, 240, 240, 0);
-    }
+//    private static Paint highlightPaint = null;
+//
+//    static {
+//        CardStack.highlightPaint = new Paint();
+//        CardStack.highlightPaint.setARGB(255, 240, 240, 0);
+//    }
 
     private final SVGImage emptyStackSVImage;
     private final CardSuit stackSuit;
@@ -33,7 +34,7 @@ public class CardStack {
     private final Rect baseRect;
     private final Rect fullRect;
     private int cardVertOffset = 0;
-    private boolean isHighlighted = false;
+//    private boolean isHighlighted = false;
 
 
     public CardStack(CardSuit suit, CardStackType stackType, Drawable emptyStackDrawable) {
@@ -52,13 +53,13 @@ public class CardStack {
     }
 
 
-    public boolean isHighlighted() {
-        return this.isHighlighted;
-    }
-
-    public void setIsHighlighted(boolean isHighlighted) {
-        this.isHighlighted = isHighlighted;
-    }
+//    public boolean isHighlighted() {
+//        return this.isHighlighted;
+//    }
+//
+//    public void setIsHighlighted(boolean isHighlighted) {
+//        this.isHighlighted = isHighlighted;
+//    }
 
     public Rect getRect() {
         return new Rect(fullRect);
@@ -121,11 +122,11 @@ public class CardStack {
     }
 
     public void drawStaticCards(Canvas canvas) {
-        if (this.isHighlighted()) {
-            RectF hiliteRect = new RectF(this.fullRect.left - 3, this.fullRect.top - 3, this.fullRect.right + 3, this.fullRect.bottom + 3);
-            CardStack.highlightPaint.setAlpha(255);
-            canvas.drawRoundRect(hiliteRect, 6.0f, 6.0f, CardStack.highlightPaint);
-        }
+//        if (this.isHighlighted()) {
+//            RectF hiliteRect = new RectF(this.fullRect.left - 3, this.fullRect.top - 3, this.fullRect.right + 3, this.fullRect.bottom + 3);
+//            CardStack.highlightPaint.setAlpha(255);
+//            canvas.drawRoundRect(hiliteRect, 6.0f, 6.0f, CardStack.highlightPaint);
+//        }
 
         // Always draw empty stack image, since a card could be in motion and not yet landed on the stack
         if (this.emptyStackSVImage != null) {
@@ -155,10 +156,6 @@ public class CardStack {
                 card.drawCard(canvas);
             }
         }
-    }
-
-    public Point getLeftTop() {
-        return new Point(this.fullRect.left, this.fullRect.top);
     }
 
     public boolean containsPoint(int x, int y) {
