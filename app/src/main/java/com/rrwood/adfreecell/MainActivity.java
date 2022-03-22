@@ -43,14 +43,14 @@ import static com.rrwood.adfreecell.CardStack.CardStackType.GENERALSTACK;
 
 public class MainActivity extends Activity implements View.OnLayoutChangeListener, View.OnTouchListener, ValueAnimator.AnimatorUpdateListener, Animator.AnimatorListener {
     static class CardMove {
-        public Card card = null;
-        public CardStack fromStack = null;
-        public CardStack toStack = null;
+        public ArrayList<Card> cards;
+        public CardStack fromStack;
+        public CardStack toStack;
 
-        public CardMove(Card c, CardStack from, CardStack to) {
-            card = c;
-            fromStack = from;
-            toStack = to;
+        public CardMove(CardStack from, CardStack to) {
+            this.cards = new ArrayList<>();
+            this.fromStack = from;
+            this.toStack = to;
         }
     }
 
@@ -84,7 +84,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     private ArrayList<CardStack> generalStacks = null;
     private ArrayList<CardStack> allStacks = null;
 
-    private ArrayList<CardMove> cardMoves = null;
+    private ArrayList<CardMove> cardMovesForUndo = null;
 
     private SVGImage restartSVGImage = null;
     private SVGImage undoSVGImage = null;
@@ -146,7 +146,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
         this.audioPlayer = new AudioPlayer();
 
         // Set up the list of card moves (used during undo)
-        this.cardMoves = new ArrayList<CardMove>();
+        this.cardMovesForUndo = new ArrayList<CardMove>();
 
         // Maintain a list of active animations and cards
         this.movingCards = new HashMap<Animator, Card>();
@@ -326,7 +326,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
         }
 
         // Clear undo stack
-        cardMoves.clear();
+        cardMovesForUndo.clear();
 
         // Clear card selections
         clearSrcCardStack();
@@ -343,7 +343,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 
         for (Card card : cards) {
             card.moveTo(0, 0);
-            moveCardToStack(card, null, generalStacks.get(stackNum), duration, false);
+            moveCardToStack(card, null, generalStacks.get(stackNum), duration, null);
             stackNum = (stackNum + 1) % NUMGENERALSTACKS;
 //        	duration = (duration + ANIM_MOVE_DELTA <= ANIM_MOVE_MAX) ? duration + ANIM_MOVE_DELTA : ANIM_MOVE_MAX;
             duration += ANIM_NEWGAME_DELTA;
@@ -441,7 +441,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
                 if (cardsCanStack(targetCard, card)) {
                     card.setIsDstCard(true);
 
-                    ObjectAnimator animation = ObjectAnimator.ofObject(card, "cardHiliteAlpha", new IntEvaluator(), 0, 255);
+                    ObjectAnimator animation = ObjectAnimator.ofObject(card, "cardHighlightAlpha", new IntEvaluator(), 0, 255);
                     animation.addUpdateListener(this);
                     animation.setDuration(500);
                     animation.setInterpolator(new DecelerateInterpolator());
@@ -540,17 +540,19 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 
 
     private void undoMove() {
-        int numMoves = cardMoves.size();
+        int numMoves = cardMovesForUndo.size();
 
         if (numMoves > 0) {
-            CardMove move = cardMoves.get(numMoves - 1);
+            CardMove move = cardMovesForUndo.get(numMoves - 1);
 
             audioPlayer.play(this, R.raw.music_marimba_chord);
 
-            // Move in the opposite direction!
-            moveSingleCard(move.toStack, move.fromStack, 0, false);
-
-            cardMoves.remove(numMoves - 1);
+                for (Card card: move.cards) {
+                    // Move in the opposite direction!
+                    sldkjlskjlsdkjlsdfjk
+                    moveSingleCard(move.toStack, move.fromStack, 0, false);
+                }
+            cardMovesForUndo.remove(numMoves - 1);
         }
     }
 
@@ -562,7 +564,15 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 
         Card srcCard = srcStack.popCard();
 
-        moveCardToStack(srcCard, srcStack, dstStack, duration, trackUndo);
+        CardMove cardMove = null;
+
+        // Keep track of move so we can undo later
+        if (trackUndo && srcStack != dstStack) {
+            cardMove = new CardMove(srcStack, dstStack);
+            this.cardMovesForUndo.add(cardMove);
+        }
+
+        moveCardToStack(srcCard, srcStack, dstStack, duration, cardMove);
     }
 
 
@@ -584,7 +594,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     }
 
 
-    private void moveCardToStack(Card srcCard, CardStack srcStack, CardStack dstStack, int duration, boolean trackUndo) {
+    private void moveCardToStack(Card srcCard, CardStack srcStack, CardStack dstStack, int duration, CardMove undoCardMove) {
         if (srcCard == null || dstStack == null) {
             return;
         }
@@ -624,9 +634,8 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
         movingCards.put(animation, srcCard);
 
         // Keep track of move so we can undo later
-        if (trackUndo && srcStack != dstStack) {
-            CardMove cardMove = new CardMove(srcCard, srcStack, dstStack);
-            cardMoves.add(cardMove);
+        if (undoCardMove != null && srcStack != dstStack) {
+            undoCardMove.cards.add(srcCard);
         }
     }
 
@@ -750,10 +759,12 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
         }
 
         int duration = ANIM_MOVE_MIN;
+        CardMove cardMove = new CardMove(srcStack, dstStack);
+        this.cardMovesForUndo.add(cardMove);
 
         for (int i = cardsToMove.size() - 1; i >= 0; i--) {
             Card tmpCard = cardsToMove.get(i);
-            moveCardToStack(tmpCard, srcStack, dstStack, duration, true);
+            moveCardToStack(tmpCard, srcStack, dstStack, duration, cardMove);
 
             duration = Math.min(duration + ANIM_MOVE_DELTA, ANIM_MOVE_MAX);
         }
