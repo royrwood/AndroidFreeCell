@@ -343,7 +343,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 
         for (Card card : cards) {
             card.moveTo(0, 0);
-            moveCardToStack(card, null, generalStacks.get(stackNum), duration, null);
+            moveCardToStack(card, generalStacks.get(stackNum), duration, null);
             stackNum = (stackNum + 1) % NUMGENERALSTACKS;
 //        	duration = (duration + ANIM_MOVE_DELTA <= ANIM_MOVE_MAX) ? duration + ANIM_MOVE_DELTA : ANIM_MOVE_MAX;
             duration += ANIM_NEWGAME_DELTA;
@@ -550,29 +550,10 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
                 for (Card card: move.cards) {
                     // Move in the opposite direction!
                     sldkjlskjlsdkjlsdfjk
-                    moveSingleCard(move.toStack, move.fromStack, 0, false);
+                    moveTopCardFromSrcStackToDstStack(move.toStack, move.fromStack, 0, false);
                 }
             cardMovesForUndo.remove(numMoves - 1);
         }
-    }
-
-
-    private void moveSingleCard(CardStack srcStack, CardStack dstStack, int duration, boolean trackUndo) {
-        if (srcStack == null) {
-            return;
-        }
-
-        Card srcCard = srcStack.popCard();
-
-        CardMove cardMove = null;
-
-        // Keep track of move so we can undo later
-        if (trackUndo && srcStack != dstStack) {
-            cardMove = new CardMove(srcStack, dstStack);
-            this.cardMovesForUndo.add(cardMove);
-        }
-
-        moveCardToStack(srcCard, srcStack, dstStack, duration, cardMove);
     }
 
 
@@ -594,17 +575,12 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     }
 
 
-    private void moveCardToStack(Card srcCard, CardStack srcStack, CardStack dstStack, int duration, CardMove undoCardMove) {
-        if (srcCard == null || dstStack == null) {
-            return;
-        }
-
+    private void moveCardToStack(Card srcCard, CardStack dstStack, int duration, CardMove undoCardMove) {
         if (duration <= 0) {
             duration = ANIM_MOVE_MIN;
         }
 
         Log.d(TAG,"moveCardToStack: Starting move of card = " + srcCard.getCardSuit().getName() + "," + srcCard.getCardVal());
-
 
         Animator currentAnimation = srcCard.getMotionAnimation();
 
@@ -634,40 +610,54 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
         movingCards.put(animation, srcCard);
 
         // Keep track of move so we can undo later
-        if (undoCardMove != null && srcStack != dstStack) {
+        if (undoCardMove != null) {
             undoCardMove.cards.add(srcCard);
         }
     }
 
 
     private void cleanupCards() {
-        boolean movedCard = false;
+        boolean movedCard = true;
         int duration = ANIM_MOVE_MIN;
 
-        do {
+        while (movedCard) {
             movedCard = false;
 
             for (CardStack srcStack : allStacks) {
-                if (srcStack.getStackType() == ACESTACK) {
-                    // Skip the ace stacks, of course
+                Card srcCard = srcStack.topCard();
+
+                if (srcCard == null || srcStack.getStackType() == ACESTACK) {
                     continue;
                 }
 
-                Card srcCard = srcStack.topCard();
+                CardStack dstStack = findDstAceStack(srcCard);
 
-                if (srcCard != null) {
-                    CardStack dstStack = findDstAceStack(srcCard);
-
-                    if (dstStack != null) {
-                        moveSingleCard(srcStack, dstStack, duration, true);
-
-                        movedCard = true;
-
-                        duration = Math.min(duration + ANIM_MOVE_DELTA, ANIM_MOVE_MAX);
-                    }
+                if (dstStack == null) {
+                    continue;
                 }
+
+                moveTopCardFromSrcStackToDstStack(srcStack, dstStack, duration, true);
+
+                movedCard = true;
+
+                duration = Math.min(duration + ANIM_MOVE_DELTA, ANIM_MOVE_MAX);
             }
-        } while (movedCard);
+        }
+    }
+
+
+    private void moveTopCardFromSrcStackToDstStack(CardStack srcStack, CardStack dstStack, int duration, boolean trackUndo) {
+        Card srcCard = srcStack.popCard();
+
+        // Keep track of move so we can undo later
+        if (trackUndo && srcStack != dstStack) {
+            CardMove cardMove = new CardMove(srcStack, dstStack);
+            this.cardMovesForUndo.add(cardMove);
+            moveCardToStack(srcCard, dstStack, duration, cardMove);
+        }
+        else {
+            moveCardToStack(srcCard, dstStack, duration, null);
+        }
     }
 
 
@@ -764,7 +754,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 
         for (int i = cardsToMove.size() - 1; i >= 0; i--) {
             Card tmpCard = cardsToMove.get(i);
-            moveCardToStack(tmpCard, srcStack, dstStack, duration, cardMove);
+            moveCardToStack(tmpCard, dstStack, duration, cardMove);
 
             duration = Math.min(duration + ANIM_MOVE_DELTA, ANIM_MOVE_MAX);
         }
@@ -986,7 +976,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
             // Move single card from one stack to another stack
             if (cardCanMoveToStack(this.currentlySelectedCard, targetStack)) {
                 Log.d(TAG,"onTouch: Move single card");
-                moveSingleCard(this.currentlySelectedCardStack, targetStack, 0, true);
+                moveTopCardFromSrcStackToDstStack(this.currentlySelectedCardStack, targetStack, 0, true);
                 clearSrcCardStack();
                 clearDstCardStack();
             }
@@ -1057,12 +1047,13 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
             // A dragged card was released, so move it to the new location or return it to its original stack
 			if (cardCanMoveToStack(this.currentlySelectedCard, targetStack)) {
                 Log.d(TAG,"onTouch: Stack drag-drop new location");
-                moveSingleCard(this.currentlySelectedCardStack, targetStack, 0, true);
+                moveTopCardFromSrcStackToDstStack(this.currentlySelectedCardStack, targetStack, 0, true);
                 clearSrcCardStack();
             }
             else {
                 Log.d(TAG,"onTouch: Stack drag-drop old location");
-                moveSingleCard(this.currentlySelectedCardStack, this.currentlySelectedCardStack, 0, true);
+                // Sneaky-- source and dest are the same stack, since we really just want the animation effect as card is moved back into place
+                moveTopCardFromSrcStackToDstStack(this.currentlySelectedCardStack, this.currentlySelectedCardStack, 0, true);
             }
 
             clearDstCardStack();
