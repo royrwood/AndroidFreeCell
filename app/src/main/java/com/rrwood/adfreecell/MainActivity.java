@@ -174,12 +174,16 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
         }
 
         // Create the ace stacks (location will be set properly after GameView layout completes)
-        // TODO: Add proper svg for each of the aces stacks
+        Drawable clubsCardDrawable = ResourcesCompat.getDrawable(res, R.drawable.face_clubs, null);
+        Drawable diamondsCardDrawable = ResourcesCompat.getDrawable(res, R.drawable.face_diamonds, null);
+        Drawable spadesCardDrawable = ResourcesCompat.getDrawable(res, R.drawable.face_spades, null);
+        Drawable heartsCardDrawable = ResourcesCompat.getDrawable(res, R.drawable.face_hearts, null);
+
         this.aceStacks = new ArrayList<CardStack>();
-        this.aceStacks.add(new CardStack(CardSuit.CLUBS, ACESTACK, blueCardDrawable));
-        this.aceStacks.add(new CardStack(CardSuit.DIAMONDS, ACESTACK, blueCardDrawable));
-        this.aceStacks.add(new CardStack(CardSuit.SPADES, ACESTACK, blueCardDrawable));
-        this.aceStacks.add(new CardStack(CardSuit.HEARTS, ACESTACK, blueCardDrawable));
+        this.aceStacks.add(new CardStack(CardSuit.CLUBS, ACESTACK, clubsCardDrawable));
+        this.aceStacks.add(new CardStack(CardSuit.DIAMONDS, ACESTACK, diamondsCardDrawable));
+        this.aceStacks.add(new CardStack(CardSuit.SPADES, ACESTACK, spadesCardDrawable));
+        this.aceStacks.add(new CardStack(CardSuit.HEARTS, ACESTACK, heartsCardDrawable));
 
         for (CardStack cardStack : this.aceStacks) {
             this.allStacks.add(cardStack);
