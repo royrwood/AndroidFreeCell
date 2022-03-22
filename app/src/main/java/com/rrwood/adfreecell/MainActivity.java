@@ -44,13 +44,13 @@ import static com.rrwood.adfreecell.CardStack.CardStackType.GENERALSTACK;
 public class MainActivity extends Activity implements View.OnLayoutChangeListener, View.OnTouchListener, ValueAnimator.AnimatorUpdateListener, Animator.AnimatorListener {
     static class CardMove {
         public ArrayList<Card> cards;
-        public CardStack fromStack;
-        public CardStack toStack;
+        public CardStack srcStack;
+        public CardStack dstStack;
 
-        public CardMove(CardStack from, CardStack to) {
+        public CardMove(CardStack srcStack, CardStack dstStack) {
             this.cards = new ArrayList<>();
-            this.fromStack = from;
-            this.toStack = to;
+            this.srcStack = srcStack;
+            this.dstStack = dstStack;
         }
     }
 
@@ -543,15 +543,19 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
         int numMoves = cardMovesForUndo.size();
 
         if (numMoves > 0) {
-            CardMove move = cardMovesForUndo.get(numMoves - 1);
+            CardMove cardMove = cardMovesForUndo.get(numMoves - 1);
 
             audioPlayer.play(this, R.raw.music_marimba_chord);
 
-                for (Card card: move.cards) {
-                    // Move in the opposite direction!
-                    sldkjlskjlsdkjlsdfjk
-                    moveTopCardFromSrcStackToDstStack(move.toStack, move.fromStack, 0, false);
-                }
+            int duration = ANIM_MOVE_MIN;
+
+            for (Card card: cardMove.cards) {
+                // Move in the opposite direction!
+                cardMove.dstStack.popCard();
+                moveCardToStack(card, cardMove.srcStack, duration, null);
+                duration = Math.min(duration + ANIM_MOVE_DELTA, ANIM_MOVE_MAX);
+            }
+
             cardMovesForUndo.remove(numMoves - 1);
         }
     }
