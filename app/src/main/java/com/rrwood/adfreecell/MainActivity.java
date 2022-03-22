@@ -742,7 +742,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 
         // Remove the cards from the source stack
 
-        ArrayList<Card> cardsToMove = new ArrayList<Card>();
+        ArrayList<Card> cardsToMove = new ArrayList<>();
 
         for (int i = 0; i < numCardsToMove; i++) {
             Card tmpCard = srcStack.popCard();
