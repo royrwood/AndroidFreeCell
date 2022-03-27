@@ -103,6 +103,8 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 
     private long lastActionDownMillis = -1;
 
+    private boolean startGameDuringFirstLayout;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -199,11 +201,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
             this.gameView.addCardStack(cardStack);
         }
 
-        for (int i = 0; i < this.cards.size(); i++) {
-            CardStack cardStack = this.generalStacks.get(i % NUMGENERALSTACKS);
-            cardStack.pushCard(this.cards.get(i), false);
-        }
-
+        this.startGameDuringFirstLayout = true;
 
         Log.d(TAG,"onCreate: Finished onCreate");
     }
@@ -927,8 +925,13 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
             int stackTop = cardGridHeight + cardBorderSize;
             int stackBottom = stackTop + currentCardHeight;
             CardStack cardStack = generalStacks.get(i);
-            cardStack.setVertOffset(currentCardHeight / 3);
+            cardStack.setVertOffset(currentCardHeight / 4);
             cardStack.setBaseRect(stackLeft, stackTop, stackRight, stackBottom);
+        }
+
+        if (this.startGameDuringFirstLayout) {
+            this.startGame(true);
+            this.startGameDuringFirstLayout = false;
         }
     }
 
