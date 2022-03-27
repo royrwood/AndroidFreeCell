@@ -150,7 +150,6 @@ public class Card {
     }
 
     public void setCardRect(int left, int top, int right, int bottom) {
-        Log.d(TAG,"setCardRect: Moving card, left=" + left);
         if (this.cardRect.left == left && this.cardRect.right == right && this.cardRect.top == top && this.cardRect.bottom == bottom) {
             return;
         }

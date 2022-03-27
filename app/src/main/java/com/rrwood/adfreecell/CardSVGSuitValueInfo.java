@@ -82,9 +82,9 @@ public class CardSVGSuitValueInfo {
         new CardSVGSuitValueInfo(R.drawable.eight_clubs, CardSuit.CLUBS, CARD_VALUE_EIGHT),
         new CardSVGSuitValueInfo(R.drawable.nine_clubs, CardSuit.CLUBS, CARD_VALUE_NINE),
         new CardSVGSuitValueInfo(R.drawable.ten_clubs, CardSuit.CLUBS, CARD_VALUE_TEN),
-        new CardSVGSuitValueInfo(R.drawable.jack_clubs, CardSuit.DIAMONDS, CARD_VALUE_JACK),
-        new CardSVGSuitValueInfo(R.drawable.queen_clubs, CardSuit.DIAMONDS, CARD_VALUE_QUEEN),
-        new CardSVGSuitValueInfo(R.drawable.king_clubs, CardSuit.DIAMONDS, CARD_VALUE_KING),
+        new CardSVGSuitValueInfo(R.drawable.jack_clubs, CardSuit.CLUBS, CARD_VALUE_JACK),
+        new CardSVGSuitValueInfo(R.drawable.queen_clubs, CardSuit.CLUBS, CARD_VALUE_QUEEN),
+        new CardSVGSuitValueInfo(R.drawable.king_clubs, CardSuit.CLUBS, CARD_VALUE_KING),
 
         new CardSVGSuitValueInfo(R.drawable.ace_hearts, CardSuit.HEARTS, CARD_VALUE_ACE),
         new CardSVGSuitValueInfo(R.drawable.two_hearts, CardSuit.HEARTS, CARD_VALUE_TWO),
@@ -96,9 +96,9 @@ public class CardSVGSuitValueInfo {
         new CardSVGSuitValueInfo(R.drawable.eight_hearts, CardSuit.HEARTS, CARD_VALUE_EIGHT),
         new CardSVGSuitValueInfo(R.drawable.nine_hearts, CardSuit.HEARTS, CARD_VALUE_NINE),
         new CardSVGSuitValueInfo(R.drawable.ten_hearts, CardSuit.HEARTS, CARD_VALUE_TEN),
-        new CardSVGSuitValueInfo(R.drawable.jack_hearts, CardSuit.DIAMONDS, CARD_VALUE_JACK),
-        new CardSVGSuitValueInfo(R.drawable.queen_hearts, CardSuit.DIAMONDS, CARD_VALUE_QUEEN),
-        new CardSVGSuitValueInfo(R.drawable.king_hearts, CardSuit.DIAMONDS, CARD_VALUE_KING),
+        new CardSVGSuitValueInfo(R.drawable.jack_hearts, CardSuit.HEARTS, CARD_VALUE_JACK),
+        new CardSVGSuitValueInfo(R.drawable.queen_hearts, CardSuit.HEARTS, CARD_VALUE_QUEEN),
+        new CardSVGSuitValueInfo(R.drawable.king_hearts, CardSuit.HEARTS, CARD_VALUE_KING),
 
         new CardSVGSuitValueInfo(R.drawable.ace_spades, CardSuit.SPADES, CARD_VALUE_ACE),
         new CardSVGSuitValueInfo(R.drawable.two_spades, CardSuit.SPADES, CARD_VALUE_TWO),
@@ -110,9 +110,9 @@ public class CardSVGSuitValueInfo {
         new CardSVGSuitValueInfo(R.drawable.eight_spades, CardSuit.SPADES, CARD_VALUE_EIGHT),
         new CardSVGSuitValueInfo(R.drawable.nine_spades, CardSuit.SPADES, CARD_VALUE_NINE),
         new CardSVGSuitValueInfo(R.drawable.ten_spades, CardSuit.SPADES, CARD_VALUE_TEN),
-        new CardSVGSuitValueInfo(R.drawable.jack_spades, CardSuit.DIAMONDS, CARD_VALUE_JACK),
-        new CardSVGSuitValueInfo(R.drawable.queen_spades, CardSuit.DIAMONDS, CARD_VALUE_QUEEN),
-        new CardSVGSuitValueInfo(R.drawable.king_spades, CardSuit.DIAMONDS, CARD_VALUE_KING),
+        new CardSVGSuitValueInfo(R.drawable.jack_spades, CardSuit.SPADES, CARD_VALUE_JACK),
+        new CardSVGSuitValueInfo(R.drawable.queen_spades, CardSuit.SPADES, CARD_VALUE_QUEEN),
+        new CardSVGSuitValueInfo(R.drawable.king_spades, CardSuit.SPADES, CARD_VALUE_KING),
     };
 
 

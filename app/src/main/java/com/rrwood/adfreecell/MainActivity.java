@@ -103,8 +103,6 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
 
     private long lastActionDownMillis = -1;
 
-    private boolean startGameDuringFirstLayout;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -201,7 +199,15 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
             this.gameView.addCardStack(cardStack);
         }
 
-        this.startGameDuringFirstLayout = true;
+        // Set up initial card positions
+        shuffleCards(cards);
+
+        int stackIndex = 0;
+        for (Card card : cards) {
+            CardStack cardStack = this.generalStacks.get(stackIndex);
+            cardStack.pushCard(card, false);
+            stackIndex = (stackIndex + 1) % NUMGENERALSTACKS;
+        }
 
         Log.d(TAG,"onCreate: Finished onCreate");
     }
@@ -769,7 +775,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
     }
 
 
-    private boolean doubleClickOccured(MotionEvent event) {
+    private boolean doubleClickOccurred(MotionEvent event) {
         boolean doubleClickDetected = false;
 
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -928,11 +934,6 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
             cardStack.setVertOffset(currentCardHeight / 4);
             cardStack.setBaseRect(stackLeft, stackTop, stackRight, stackBottom);
         }
-
-        if (this.startGameDuringFirstLayout) {
-            this.startGame(true);
-            this.startGameDuringFirstLayout = false;
-        }
     }
 
     @Override
@@ -958,7 +959,7 @@ public class MainActivity extends Activity implements View.OnLayoutChangeListene
         CardStack targetStack = findCardStack((int) event.getX(), (int) event.getY());
 
         // These booleans make things more readable below...
-        boolean doubleClickDetected = doubleClickOccured(event);
+        boolean doubleClickDetected = doubleClickOccurred(event);
         boolean srcCardSelected = this.currentlySelectedCard != null;
         boolean movingBetweenStacks = (this.currentlySelectedCard != null && this.currentlySelectedCardStack != null  && targetStack != null && this.currentlySelectedCardStack != targetStack);
         boolean srcAndDstAreGeneral = (movingBetweenStacks && this.currentlySelectedCardStack.getStackType() == GENERALSTACK && targetStack.getStackType() == GENERALSTACK);
